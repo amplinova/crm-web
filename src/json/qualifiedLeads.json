@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "name": "Robert Wilson",
+    "email": "robert.w@email.com",
+    "phone": "+1 (555) 345-6789",
+    "status": "Qualified",
+    "source": "Website",
+    "date": "2025-01-15"
+  },
+  {
+    "id": 2,
+    "name": "David Brown",
+    "email": "david.b@email.com",
+    "phone": "+1 (555) 654-3210",
+    "status": "Qualified",
+    "source": "Referral",
+    "date": "2025-03-22"
+  }
+]

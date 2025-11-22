@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "name": "Sarah Johnson",
+    "email": "sarah.johnson@amplinova.com",
+    "phone": "+1 987-654-3210",
+    "region": "West Coast",
+    "totalCustomers": 12,
+    "conversionRate": "68%",
+    "status": "Active"
+  },
+  {
+    "id": 2,
+    "name": "Michael Chen",
+    "email": "michael.chen@amplinova.com",
+    "phone": "+1 765-432-1098",
+    "region": "East Coast",
+    "totalCustomers": 9,
+    "conversionRate": "72%",
+    "status": "Active"
+  },
+  {
+    "id": 3,
+    "name": "Emily Davis",
+    "email": "emily.davis@amplinova.com",
+    "phone": "+1 234-567-8901",
+    "region": "South Region",
+    "totalCustomers": 15,
+    "conversionRate": "64%",
+    "status": "Active"
+  },
+  {
+    "id": 4,
+    "name": "David Lee",
+    "email": "david.lee@amplinova.com",
+    "phone": "+1 543-219-8760",
+    "region": "North Region",
+    "totalCustomers": 7,
+    "conversionRate": "59%",
+    "status": "Active"
+  },
+  {
+    "id": 5,
+    "name": "Olivia Brown",
+    "email": "olivia.brown@amplinova.com",
+    "phone": "+1 345-678-9012",
+    "region": "Central",
+    "totalCustomers": 10,
+    "conversionRate": "66%",
+    "status": "Inactive"
+  }
+]

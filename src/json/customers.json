@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "name": "John Smith",
+    "email": "john.smith@example.com",
+    "phone": "+1 202-555-0143",
+    "status": "Active",
+    "assignedAgent": "Sarah Johnson",
+    "qualificationStatus": "Qualified",
+    "customerType": "Premium",
+    "joinDate": "2024-09-12",
+    "totalSpent": 3500,
+    "orders": 8,
+    "notes": "Prefers morning calls and email communication."
+  },
+  {
+    "id": 2,
+    "name": "Ava Martinez",
+    "email": "ava.martinez@example.com",
+    "phone": "+1 303-555-0169",
+    "status": "Active",
+    "assignedAgent": "Michael Chen",
+    "qualificationStatus": "Qualified",
+    "customerType": "Regular",
+    "joinDate": "2025-01-25",
+    "totalSpent": 2200,
+    "orders": 5,
+    "notes": "Frequent repeat customer; open to upselling premium plans."
+  },
+  {
+    "id": 3,
+    "name": "David Green",
+    "email": "david.green@example.com",
+    "phone": "+1 212-555-0188",
+    "status": "Inactive",
+    "assignedAgent": "Emily Davis",
+    "qualificationStatus": "Unqualified",
+    "customerType": "Trial",
+    "joinDate": "2023-11-10",
+    "totalSpent": 500,
+    "orders": 1,
+    "notes": "No recent engagement; contact after 3 months."
+  },
+  {
+    "id": 4,
+    "name": "Sophia Patel",
+    "email": "sophia.patel@example.com",
+    "phone": "+1 415-555-0104",
+    "status": "Active",
+    "assignedAgent": "David Lee",
+    "qualificationStatus": "Qualified",
+    "customerType": "Premium",
+    "joinDate": "2024-05-14",
+    "totalSpent": 4600,
+    "orders": 10,
+    "notes": "Top-spending customer, prefers personal calls."
+  },
+  {
+    "id": 5,
+    "name": "Noah Wilson",
+    "email": "noah.wilson@example.com",
+    "phone": "+1 646-555-0199",
+    "status": "Active",
+    "assignedAgent": "Olivia Brown",
+    "qualificationStatus": "Prospect",
+    "customerType": "Regular",
+    "joinDate": "2025-04-07",
+    "totalSpent": 1200,
+    "orders": 3,
+    "notes": "Referred by existing customer. Recently onboarded."
+  }
+]
