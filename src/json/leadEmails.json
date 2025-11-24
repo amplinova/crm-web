@@ -1,0 +1,36 @@
+[
+  {
+    "leadId": 1,
+    "emails": [
+      {
+        "id": 501,
+        "date": "2025-11-17T12:15:00",
+        "from": "sales@company.com",
+        "to": "client@example.com",
+        "subject": "CRM Demo & Quote",
+        "snippet": "Please find attached the demo recording and quote..."
+      },
+      {
+        "id": 502,
+        "date": "2025-11-16T08:30:00",
+        "from": "noreply@company.com",
+        "to": "client@example.com",
+        "subject": "Meeting confirmation",
+        "snippet": "This mail confirms the meeting scheduled on..."
+      }
+    ]
+  },
+  {
+    "leadId": 2,
+    "emails": [
+      {
+        "id": 601,
+        "date": "2025-11-10T14:00:00",
+        "from": "support@company.com",
+        "to": "lead2@example.com",
+        "subject": "Welcome",
+        "snippet": "Thanks for connecting with us..."
+      }
+    ]
+  }
+]

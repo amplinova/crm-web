@@ -1,0 +1,36 @@
+[
+  {
+    "leadId": 1,
+    "tasks": [
+      {
+        "id": 801,
+        "title": "Prepare demo slides",
+        "dueDate": "2025-11-19",
+        "assignedTo": "Sanjay",
+        "status": "Open",
+        "notes": "Add customer's logo"
+      },
+      {
+        "id": 802,
+        "title": "Send follow-up email",
+        "dueDate": "2025-11-18",
+        "assignedTo": "Nisha",
+        "status": "In Progress",
+        "notes": "Attach pricing document"
+      }
+    ]
+  },
+  {
+    "leadId": 2,
+    "tasks": [
+      {
+        "id": 901,
+        "title": "Prepare PO details",
+        "dueDate": "2025-11-22",
+        "assignedTo": "Asha",
+        "status": "Open",
+        "notes": ""
+      }
+    ]
+  }
+]

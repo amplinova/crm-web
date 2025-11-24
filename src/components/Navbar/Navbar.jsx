@@ -2,11 +2,13 @@
 import React, { useState, useEffect } from "react";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
 import { useAuth } from "../../Auth/AuthContext"; // Import AuthContext
+import { useNavigate } from "react-router-dom";
 
 const Navbar = ({ setSidebarOpen }) => {
   const [profileOpen, setProfileOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const { logout } = useAuth();
+  const navigate = useNavigate();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -23,6 +25,11 @@ const Navbar = ({ setSidebarOpen }) => {
     logout();
     setShowLogoutModal(false);
     window.location.href = "/login";
+  };
+
+  const handleMyAccount = () => {
+    setProfileOpen(false);
+    navigate("/my-account");
   };
 
   return (
@@ -59,9 +66,13 @@ const Navbar = ({ setSidebarOpen }) => {
 
           {profileOpen && (
             <div className="absolute right-0 mt-3 w-44 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 animate-fadeIn">
-              <div className="px-4 py-2 text-sm border-b border-gray-200 dark:border-gray-700">
+              {/* Make this clickable and navigate */}
+              <button
+                onClick={handleMyAccount}
+                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 rounded-t-md"
+              >
                 <p className="font-semibold">My Account</p>
-              </div>
+              </button>
 
               <button
                 onClick={() => setShowLogoutModal(true)}
