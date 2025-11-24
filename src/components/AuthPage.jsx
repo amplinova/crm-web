@@ -1,7 +1,8 @@
 // src/Auth/AuthPage.js
 import React, { useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
-import ampliNovaLogo from "../Assets/AmpliNova Final Logo.png";
+import ampliNovaLogo from "../Assets/AmpliNova  Logo-White.png";
 import axios from "axios";
 import toast from "react-hot-toast";
 
@@ -10,6 +11,7 @@ import { useAuth } from "../Auth/AuthContext";
 
 const AuthPage = () => {
   const { login } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -78,26 +80,53 @@ const AuthPage = () => {
           {errorMsg && <p className="text-red-600 text-sm mb-3">{errorMsg}</p>}
 
           <form onSubmit={handleLogin}>
-            <div className="space-y-4">
-              <input
-                type="email"
-                name="email"
-                placeholder="Email address"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-gray-800"
-              />
+  <div className="space-y-4">
 
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-gray-800"
-              />
+    {/* Email */}
+    <div>
+      <label className="block text-gray-700 font-semibold mb-2">
+        Email
+      </label>
+      <input
+        type="email"
+        name="email"
+        placeholder="Enter your Email Address"
+        value={formData.email}
+        onChange={handleChange}
+        required
+        className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-gray-800 focus:ring-2 focus:ring-blue-400"
+      />
+    </div>
+
+              <div>
+  <label className="block text-gray-700 font-semibold mb-2">
+    Password
+  </label>
+
+  <div className="relative">
+    <input
+      type={showPassword ? "text" : "password"}
+      name="password"
+      placeholder="Enter your password"
+      value={formData.password}
+      onChange={handleChange}
+      required
+      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-gray-800 pr-12 focus:ring-2 focus:ring-blue-400"
+    />
+
+    <button
+      type="button"
+      onClick={() => setShowPassword(!showPassword)}
+      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-800"
+    >
+      {showPassword ? (
+        <FaEyeSlash size={20} />  // slightly bigger for visibility
+      ) : (
+        <FaEye size={20} />
+      )}
+    </button>
+  </div>
+</div>
 
               <button
                 type="submit"

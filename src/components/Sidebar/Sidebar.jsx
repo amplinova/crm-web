@@ -8,17 +8,22 @@ import {
   Cog6ToothIcon,
   UserIcon,
   ChevronDownIcon,
+  EnvelopeIcon,
+  ClipboardDocumentCheckIcon,
+  DocumentTextIcon,
+  BriefcaseIcon,
 } from "@heroicons/react/24/outline";
-import ampliNovaLogo from "../../Assets/AmpliNova  Logo-A LOGO.png";
+
+import ampliNovaLogo from "../../Assets/AmpliNova  Logo-Name.png";
 
 const Sidebar = ({ sidebarOpen }) => {
   const [leadsDropdownOpen, setLeadsDropdownOpen] = useState(false);
+  const [teamDropdownOpen, setTeamDropdownOpen] = useState(false);
   const location = useLocation();
 
-  // Auto-expand dropdowns
   useEffect(() => {
     if (location.pathname.startsWith("/leads")) setLeadsDropdownOpen(true);
-  
+    if (location.pathname.startsWith("/team-structure")) setTeamDropdownOpen(true);
   }, [location.pathname]);
 
   const linkClass = (isActive) =>
@@ -33,32 +38,27 @@ const Sidebar = ({ sidebarOpen }) => {
       } bg-blue-700 text-white w-64 h-screen fixed md:static md:translate-x-0 
       transition-transform duration-300 z-30 flex flex-col shadow-xl`}
     >
-      {/* ✅ Header with Bigger Clearer Logo */}
+      {/* Logo Header */}
       <NavLink
         to="/dashboard"
-        className="sticky top-0 z-20 flex items-center justify-center gap-3 p-5 
-        border-b border-blue-500 bg-blue-700 cursor-pointer hover:bg-blue-600 transition-all"
+        className="
+          sticky top-0 z-20 
+          flex items-center justify-center 
+          p-6 w-full
+          bg-white
+          border-b border-gray-300
+        "
       >
         <img
           src={ampliNovaLogo}
-          alt="AmpliNova Logo"
-          className="
-            w-20 h-20
-            object-contain
-            drop-shadow-xl
-            rounded-2xl
-            bg-white/90
-            p-2
-          "
+          alt="Logo"
+          className="w-40 h-auto object-contain"
         />
-        <h1 className="text-xl font-semibold tracking-wide whitespace-nowrap">
-          AmpliNova
-        </h1>
       </NavLink>
 
-      {/* Navigation Menu */}
-      <nav className="flex-1 overflow-y-auto">
+      <nav className="flex-1 overflow-y-hidden">
         <ul className="p-3 space-y-1">
+          
           {/* Dashboard */}
           <li>
             <NavLink to="/dashboard" className={({ isActive }) => linkClass(isActive)}>
@@ -67,11 +67,75 @@ const Sidebar = ({ sidebarOpen }) => {
             </NavLink>
           </li>
 
+          {/* ⭐ Team Structure DROP–DOWN */}
+          <li>
+            <button
+              onClick={() => setTeamDropdownOpen(!teamDropdownOpen)}
+              className={`flex items-center w-full px-4 py-2 rounded-lg hover:bg-blue-600 transition-all ${
+                location.pathname.startsWith("/team-structure") ? "bg-blue-800" : ""
+              }`}
+            >
+              <BriefcaseIcon className="h-5 w-5 mr-3" />
+              <span className="flex-1 text-left">Team Structure</span>
+              <ChevronDownIcon
+                className={`h-4 w-4 transition-transform ${
+                  teamDropdownOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+
+            {teamDropdownOpen && (
+              <ul className="ml-4 mt-1 space-y-1 text-sm">
+
+                <li>
+                  <NavLink
+                    to="/team-structure/admin"
+                    className={({ isActive }) =>
+                      `block w-full px-3 py-2 rounded-md transition ${
+                        isActive ? "bg-blue-800 text-white" : "hover:bg-blue-600 text-blue-100"
+                      }`
+                    }
+                  >
+                    Admin
+                  </NavLink>
+                </li>
+
+                <li>
+                  <NavLink
+                    to="/team-structure/roles"
+                    className={({ isActive }) =>
+                      `block w-full px-3 py-2 rounded-md transition ${
+                        isActive ? "bg-blue-800 text-white" : "hover:bg-blue-600 text-blue-100"
+                      }`
+                    }
+                  >
+                    Roles
+                  </NavLink>
+                </li>
+
+                <li>
+                  <NavLink
+                    to="/team-structure/permissions"
+                    className={({ isActive }) =>
+                      `block w-full px-3 py-2 rounded-md transition ${
+                        isActive ? "bg-blue-800 text-white" : "hover:bg-blue-600 text-blue-100"
+                      }`
+                    }
+                  >
+                    Permissions
+                  </NavLink>
+                </li>
+
+              </ul>
+            )}
+          </li>
+
           {/* Leads */}
           <li>
             <button
               onClick={() => setLeadsDropdownOpen(!leadsDropdownOpen)}
-              className={`flex items-center w-full px-4 py-2 rounded-lg hover:bg-blue-600 transition-all ${
+              className={`flex items-center w-full px-4 py-2 rounded-lg 
+              hover:bg-blue-600 transition-all ${
                 location.pathname.startsWith("/leads") ? "bg-blue-800" : ""
               }`}
             >
@@ -86,46 +150,51 @@ const Sidebar = ({ sidebarOpen }) => {
 
             {leadsDropdownOpen && (
               <ul className="ml-4 mt-1 space-y-1 text-sm">
+
+                <li>
+  <NavLink
+    to="/leads"
+    end
+    className={({ isActive }) =>
+      `block w-full px-3 py-2 rounded-md transition ${
+        isActive ? "bg-blue-800 text-white" : "hover:bg-blue-600 text-blue-100"
+      }`
+    }
+  >
+    All Leads
+  </NavLink>
+</li>
+
+
                 <li>
                   <NavLink
-                    to="/leads"
+                    to="/leads/status"
                     className={({ isActive }) =>
                       `block w-full px-3 py-2 rounded-md transition ${
                         isActive ? "bg-blue-800 text-white" : "hover:bg-blue-600 text-blue-100"
                       }`
                     }
                   >
-                    All Leads
+                    Lead Status
                   </NavLink>
                 </li>
+
                 <li>
                   <NavLink
-                    to="/leads/qualified"
+                    to="/leads/recycle-bin"
                     className={({ isActive }) =>
                       `block w-full px-3 py-2 rounded-md transition ${
                         isActive ? "bg-blue-800 text-white" : "hover:bg-blue-600 text-blue-100"
                       }`
                     }
                   >
-                    Qualified Leads
+                    Lead Recycle Bin
                   </NavLink>
                 </li>
-                <li>
-                  <NavLink
-                    to="/leads/unqualified"
-                    className={({ isActive }) =>
-                      `block w-full px-3 py-2 rounded-md transition ${
-                        isActive ? "bg-blue-800 text-white" : "hover:bg-blue-600 text-blue-100"
-                      }`
-                    }
-                  >
-                    Unqualified Leads
-                  </NavLink>
-                </li>
+
               </ul>
             )}
           </li>
-
 
           {/* Agents */}
           <li>
@@ -135,7 +204,7 @@ const Sidebar = ({ sidebarOpen }) => {
             </NavLink>
           </li>
 
-          {/* Sales */}
+          {/* Sources */}
           <li>
             <NavLink to="/sources" className={({ isActive }) => linkClass(isActive)}>
               <CurrencyDollarIcon className="h-5 w-5 mr-3" />
@@ -151,6 +220,38 @@ const Sidebar = ({ sidebarOpen }) => {
             </NavLink>
           </li>
 
+          {/* Email & SMS */}
+          <li>
+            <NavLink to="/email-sms" className={({ isActive }) => linkClass(isActive)}>
+              <EnvelopeIcon className="h-5 w-5 mr-3" />
+              Email & SMS
+            </NavLink>
+          </li>
+
+          {/* Follow-up Report */}
+          <li>
+            <NavLink to="/followup-report" className={({ isActive }) => linkClass(isActive)}>
+              <ClipboardDocumentListIcon className="h-5 w-5 mr-3" />
+              Follow-up Report
+            </NavLink>
+          </li>
+
+          {/* Task */}
+          <li>
+            <NavLink to="/task" className={({ isActive }) => linkClass(isActive)}>
+              <ClipboardDocumentCheckIcon className="h-5 w-5 mr-3" />
+              Task
+            </NavLink>
+          </li>
+
+          {/* Invoice */}
+          <li>
+            <NavLink to="/invoice" className={({ isActive }) => linkClass(isActive)}>
+              <DocumentTextIcon className="h-5 w-5 mr-3" />
+              Invoice
+            </NavLink>
+          </li>
+
           {/* Settings */}
           <li>
             <NavLink to="/settings" className={({ isActive }) => linkClass(isActive)}>
@@ -158,6 +259,7 @@ const Sidebar = ({ sidebarOpen }) => {
               Settings
             </NavLink>
           </li>
+
         </ul>
       </nav>
 

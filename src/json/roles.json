@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "roleName": "Admin",
+    "description": "Full access to all features"
+  },
+  {
+    "id": 2,
+    "roleName": "Sales Manager",
+    "description": "Manages all sales-related operations"
+  },
+  {
+    "id": 3,
+    "roleName": "Viewer",
+    "description": "Can only view data"
+  }
+]
