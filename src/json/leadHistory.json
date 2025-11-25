@@ -1,0 +1,54 @@
+[
+  {
+    "leadId": 1,
+    "entries": [
+      {
+        "id": 101,
+        "contactDate": "2025-11-17T10:00:00",
+        "nextSchedule": "2025-11-20T15:00:00",
+        "description": "CRM Demo Schedule",
+        "status": "Callback",
+        "priority": "High",
+        "calledNumber": "8688179505",
+        "callType": "Outgoing",
+        "callDuration": "00:02:30",
+        "recordedFile": "call_101.mp3",
+        "processedBy": "Nisha",
+        "location": "Mumbai"
+      },
+      {
+        "id": 102,
+        "contactDate": "2025-11-16T09:30:00",
+        "nextSchedule": "2025-11-18T10:00:00",
+        "description": "Follow-up - Pricing",
+        "status": "Callback",
+        "priority": "Medium",
+        "calledNumber": "9876543210",
+        "callType": "Incoming",
+        "callDuration": "00:01:10",
+        "recordedFile": "call_102.mp3",
+        "processedBy": "Sanjay",
+        "location": "Hyderabad"
+      }
+    ]
+  },
+  {
+    "leadId": 2,
+    "entries": [
+      {
+        "id": 201,
+        "contactDate": "2025-11-15T11:00:00",
+        "nextSchedule": null,
+        "description": "Intro call",
+        "status": "Done",
+        "priority": "Low",
+        "calledNumber": "9000000000",
+        "callType": "Outgoing",
+        "callDuration": "00:00:50",
+        "recordedFile": null,
+        "processedBy": "Asha",
+        "location": "Delhi"
+      }
+    ]
+  }
+]

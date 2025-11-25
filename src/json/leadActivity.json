@@ -1,0 +1,30 @@
+[
+  {
+    "leadId": 1,
+    "activity": [
+      {
+        "id": 301,
+        "date": "2025-11-17T13:00:00",
+        "type": "Note",
+        "description": "Client asked about integration with ERP"
+      },
+      {
+        "id": 302,
+        "date": "2025-11-16T10:30:00",
+        "type": "Status Change",
+        "description": "Moved from New -> Contacted"
+      }
+    ]
+  },
+  {
+    "leadId": 2,
+    "activity": [
+      {
+        "id": 401,
+        "date": "2025-11-10T09:10:00",
+        "type": "Note",
+        "description": "Left voicemail"
+      }
+    ]
+  }
+]
