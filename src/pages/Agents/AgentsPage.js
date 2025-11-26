@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import useAxios from "../Auth/useAxios";
+import useAxios from "../../Auth/useAxios";
 import Swal from "sweetalert2";
 import { TrashIcon, PencilIcon, EyeIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
@@ -59,7 +59,9 @@ const UsersPage = () => {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-blue-700">Employees Management</h1>
+        <h1 className="text-2xl font-bold text-blue-700">
+          Employees Management
+        </h1>
 
         <div className="flex items-center border rounded-lg overflow-hidden">
           <input
@@ -91,11 +93,15 @@ const UsersPage = () => {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan="7" className="text-center py-6">Loading...</td>
+                <td colSpan="7" className="text-center py-6">
+                  Loading...
+                </td>
               </tr>
             ) : filteredUsers.length === 0 ? (
               <tr>
-                <td colSpan="7" className="text-center py-6">No users found</td>
+                <td colSpan="7" className="text-center py-6">
+                  No users found
+                </td>
               </tr>
             ) : (
               filteredUsers.map((user) => (

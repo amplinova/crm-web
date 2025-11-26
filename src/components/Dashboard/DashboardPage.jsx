@@ -1,5 +1,7 @@
 import React from "react";
 import { FiSearch, FiBell, FiSettings, FiUser } from "react-icons/fi";
+import { FaUsers, FaPhone, FaChartLine, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import welcomeImg from "../../Assets/dashboard.png";
 
 const Dashboard = () => {
   // -------------------------------------
@@ -9,7 +11,8 @@ const Dashboard = () => {
     header: {
       title: "Dashboard",
       searchPlaceholder: "Search Leads...",
-      rightIcons: ["bell", "settings", "user"]
+      // Only icons 1 and 3 (bell and user)
+      rightIcons: ["bell", "user"],
     },
 
     welcomeBoard: {
@@ -30,31 +33,31 @@ const Dashboard = () => {
     },
 
     rightSideCards: [
-      { label: "New Leads", count: 19 },
-      { label: "Transfer Leads", count: 0 },
-      { label: "Pending Leads", count: 0 },
-      { label: "Processing Leads", count: 0 },
-      { label: "Interested Leads", count: 0 },
-      { label: "Not Picked Leads", count: 0 },
-      { label: "Meeting Scheduled Leads", count: 0 },
-      { label: "Whatsapp Scheduled Leads", count: 0 },
-      { label: "Call Scheduled Leads", count: 0 },
-      { label: "Visit Scheduled Leads", count: 0 },
-      { label: "Visit Done Leads", count: 0 },
-      { label: "Booked Leads", count: 0 },
-      { label: "Completed", count: 0 },
-      { label: "Cancelled", count: 0 },
-      { label: "Others", count: 0 }
-    ]
+      { label: "New Leads", count: 19, icon: <FaUsers className="h-7 w-7 text-blue-600" /> },
+      { label: "Transfer Leads", count: 0, icon: <FaChartLine className="h-7 w-7 text-green-600" /> },
+      { label: "Pending Leads", count: 0, icon: <FaPhone className="h-7 w-7 text-gray-600" /> },
+      { label: "Processing Leads", count: 0, icon: <FaUsers className="h-7 w-7 text-purple-600" /> },
+      { label: "Interested Leads", count: 0, icon: <FaCheckCircle className="h-7 w-7 text-green-600" /> },
+      { label: "Not Picked Leads", count: 0, icon: <FaTimesCircle className="h-7 w-7 text-red-600" /> },
+      { label: "Meeting Scheduled Leads", count: 0, icon: <FaUsers className="h-7 w-7 text-blue-600" /> },
+      { label: "Whatsapp Scheduled Leads", count: 0, icon: <FaUsers className="h-7 w-7 text-green-600" /> },
+      { label: "Call Scheduled Leads", count: 0, icon: <FaPhone className="h-7 w-7 text-blue-600" /> },
+      { label: "Visit Scheduled Leads", count: 0, icon: <FaUsers className="h-7 w-7 text-indigo-600" /> },
+      { label: "Visit Done Leads", count: 0, icon: <FaCheckCircle className="h-7 w-7 text-green-600" /> },
+      { label: "Booked Leads", count: 0, icon: <FaCheckCircle className="h-7 w-7 text-green-700" /> },
+      { label: "Completed", count: 0, icon: <FaCheckCircle className="h-7 w-7 text-green-800" /> },
+      { label: "Cancelled", count: 0, icon: <FaTimesCircle className="h-7 w-7 text-red-700" /> },
+      { label: "Others", count: 0, icon: <FaUsers className="h-7 w-7 text-gray-700" /> }
+    ],
   };
 
   const { header, welcomeBoard, rightSideCards } = data;
 
-  // Icon mapping
+  // Icon mapping for header
   const iconMap = {
     bell: <FiBell size={20} />,
     settings: <FiSettings size={20} />,
-    user: <FiUser size={20} />
+    user: <FiUser size={20} />,
   };
 
   // -------------------------------------
@@ -79,7 +82,7 @@ const Dashboard = () => {
             />
           </div>
 
-          {/* Right Header Icons */}
+          {/* Right Header Icons (ONLY 1 and 3) */}
           <div className="flex items-center gap-4">
             {header.rightIcons.map((i, index) => (
               <div
@@ -101,6 +104,13 @@ const Dashboard = () => {
           <h2 className="text-xl font-bold">{welcomeBoard.title}</h2>
           <p className="text-sm text-gray-500">{welcomeBoard.subtitle}</p>
 
+          {/* IMAGE */}
+          <img
+            src={welcomeImg}
+            alt="Welcome"
+            className="w-full h-42 object-cover rounded-lg mb-3"
+          />
+
           <div className="mt-4 p-4 bg-blue-100 rounded-lg">
             <p>Total Leads: {welcomeBoard.totalLeads}</p>
             <p>Transferred Leads: {welcomeBoard.transferredLeads}</p>
@@ -108,10 +118,7 @@ const Dashboard = () => {
 
           <div className="grid grid-cols-2 gap-3 mt-4">
             {welcomeBoard.buttons.map((item, index) => (
-              <div
-                key={index}
-                className="p-3 bg-blue-50 rounded-lg shadow text-center"
-              >
+              <div key={index} className="p-3 bg-blue-50 rounded-lg shadow text-center">
                 <p className="font-medium">{item.label}</p>
                 <p className="text-xl font-bold text-blue-700">{item.count}</p>
               </div>
@@ -125,9 +132,15 @@ const Dashboard = () => {
             {rightSideCards.map((card, index) => (
               <div
                 key={index}
-                className="bg-white p-4 rounded-xl shadow text-center"
+                className="bg-white p-4 rounded-xl shadow text-center flex flex-col items-center"
               >
+                {/* ICON */}
+                <div className="mb-2">
+                  {card.icon}
+                </div>
+
                 <p className="font-semibold">{card.label}</p>
+
                 <p className="text-2xl font-bold mt-2 text-blue-600">
                   {card.count}
                 </p>
