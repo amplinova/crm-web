@@ -56,8 +56,15 @@ const Sidebar = ({ sidebarOpen }) => {
         />
       </NavLink>
 
-      <nav className="flex-1 overflow-y-hidden">
+      <nav
+  className="flex-1 overflow-y-scroll scroll-smooth"
+  style={{
+    scrollbarWidth: "none",   // Firefox
+    msOverflowStyle: "none",  // IE/Edge
+  }}
+>
         <ul className="p-3 space-y-1">
+  
           
           {/* Dashboard */}
           <li>

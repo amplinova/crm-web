@@ -1,0 +1,38 @@
+[
+  {
+    "role": "Admin",
+    "permissions": {
+      "view": true,
+      "create": true,
+      "edit": true,
+      "delete": true
+    }
+  },
+  {
+    "role": "Manager",
+    "permissions": {
+      "view": true,
+      "create": true,
+      "edit": true,
+      "delete": false
+    }
+  },
+  {
+    "role": "Team Lead",
+    "permissions": {
+      "view": true,
+      "create": true,
+      "edit": false,
+      "delete": false
+    }
+  },
+  {
+    "role": "Agent",
+    "permissions": {
+      "view": true,
+      "create": false,
+      "edit": false,
+      "delete": false
+    }
+  }
+]

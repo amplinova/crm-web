@@ -1,0 +1,39 @@
+
+[
+  {
+    "id": 1,
+    "fullName": "John Michael",
+    "email": "john.michael@example.com",
+    "username": "johnm99",
+    "mobile": "9876543210",
+    "role": "ADMIN",
+    "status": "Active"
+  },
+  {
+    "id": 2,
+    "fullName": "Priya Sharma",
+    "email": "priya.sharma@example.com",
+    "username": "priya_s",
+    "mobile": "9001234567",
+    "role": "ADMIN",
+    "status": "Active"
+  },
+  {
+    "id": 3,
+    "fullName": "Rohit Verma",
+    "email": "rohit.verma@example.com",
+    "username": "rohitv12",
+    "mobile": "9012345678",
+    "role": "ADMIN",
+    "status": "Inactive"
+  },
+  {
+    "id": 4,
+    "fullName": "Sara Khan",
+    "email": "sara.khan@example.com",
+    "username": "sarak07",
+    "mobile": "9123456780",
+    "role": "ADMIN",
+    "status": "Active"
+  }
+]
