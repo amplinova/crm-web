@@ -1,125 +1,145 @@
 // EmailSMS.jsx
-import React, { useMemo, useState } from "react";
-import {
-  createEditor,
-  Editor,
-  Transforms,
-  Element as SlateElement,
-} from "slate";
-import { Slate, Editable, withReact, useSlate } from "slate-react";
-import { withHistory } from "slate-history";
-
-// ✅ Initial content for the editor – MUST be an array
-const INITIAL_VALUE = [
-  {
-    type: "paragraph",
-    children: [
-      {
-        text: "This is editable rich text, much better than a <textarea>!",
-      },
-    ],
-  },
-];
+import React, { useState, useEffect } from "react";
+import useAxios from "../../Auth/useAxios";
+import Swal from "sweetalert2";
 
 export default function EmailSMS() {
+  const [leads, setLeads] = useState([]);
+  const api = useAxios();
+
   const [formData, setFormData] = useState({
-    from: "",
-    to: "",
-    cc: "",
+    leadId: "",
+    fromEmail: "satyanarayanarft@gmail.com", // Fixed From Email
+    toEmail: "",
+    ccEmail: "",
     subject: "",
+    description: "",
   });
 
   const [loading, setLoading] = useState(false);
-  const [sent, setSent] = useState(false);
 
-  // ✅ Create Slate editor instance
-  const editor = useMemo(() => withHistory(withReact(createEditor())), []);
+  /* ---------------- LOAD LEADS ---------------- */
+  const getAllLeads = async () => {
+    try {
+      const res = await api.get("/api/leads");
+      setLeads(res.data.data || []);
+    } catch {
+      Swal.fire("Error", "Failed to load leads", "error");
+    }
+  };
 
-  // ✅ Editor value state (ALWAYS an array)
-  const [value, setValue] = useState(INITIAL_VALUE);
+  /* ---------------- INIT ---------------- */
+  useEffect(() => {
+    getAllLeads();
+  }, []);
 
+  /* ---------------- HANDLE FIELD CHANGE ---------------- */
   const handleFieldChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSend = (e) => {
+  /* ---------------- AUTO FILL EMAIL BASED ON LEAD ---------------- */
+  const handleLeadSelect = (leadId) => {
+    const selectedLead = leads.find((l) => l.id.toString() === leadId.toString());
+
+    setFormData((prev) => ({
+      ...prev,
+      leadId: leadId,
+      toEmail: selectedLead?.email || "",
+    }));
+  };
+
+  /* ---------------- SEND EMAIL API ---------------- */
+  const handleSend = async (e) => {
     e.preventDefault();
+
+    if (!formData.leadId) {
+      return Swal.fire("Error", "Please select a lead", "error");
+    }
+
     setLoading(true);
-    setSent(false);
 
-    // Convert Slate nodes to plain text for sending
-    const messageText = value.map((n) => Editor.string(editor, n)).join("\n");
+    const payload = {
+      leadId: formData.leadId,
+      fromEmail: formData.fromEmail, // fixed
+      toEmail: formData.toEmail,
+      ccEmail: formData.ccEmail,
+      subject: formData.subject,
+      description: formData.description,
+    };
 
-    console.log({
-      ...formData,
-      message: messageText,
-    });
+    try {
+      await api.post("/api/leads/email", payload);
+      Swal.fire("Success", "Email sent successfully!", "success");
 
-    // Simulate API
-    setTimeout(() => {
-      setLoading(false);
-      setSent(true);
+      // Reset form (keep fromEmail fixed)
       setFormData({
-        from: "",
-        to: "",
-        cc: "",
+        leadId: "",
+        fromEmail: "satyanarayanarft@gmail.com",
+        toEmail: "",
+        ccEmail: "",
         subject: "",
+        description: "",
       });
-      setValue([
-        {
-          type: "paragraph",
-          children: [{ text: "" }],
-        },
-      ]);
-    }, 1000);
+    } catch (err) {
+      Swal.fire("Error", err?.response?.data || "Failed to send email", "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="w-full max-w-3xl bg-white rounded-xl shadow-md p-6">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">
-        Compose Email / SMS
-      </h2>
-
-      {sent && (
-        <div className="mb-4 p-3 rounded bg-green-100 text-green-700 font-medium">
-          ✅ Message sent successfully!
-        </div>
-      )}
+    <div className="w-full max-w-4xl bg-white rounded-xl shadow-md p-6 mx-auto">
+      <h2 className="text-2xl font-bold mb-4 text-gray-800">Compose Email</h2>
 
       <form onSubmit={handleSend} className="space-y-4">
-        {/* From */}
+        {/* LEAD DROPDOWN */}
+        <select
+          name="leadId"
+          value={formData.leadId}
+          onChange={(e) => handleLeadSelect(e.target.value)}
+          required
+          className="w-full p-2 border rounded"
+        >
+          <option value="">Select Lead</option>
+          {leads.map((lead) => (
+            <option key={lead.id} value={lead.id}>
+              {lead.fullName} ({lead.email})
+            </option>
+          ))}
+        </select>
+
+        {/* FROM EMAIL (FIXED) */}
         <input
           type="email"
-          name="from"
-          placeholder="From"
-          value={formData.from}
-          onChange={handleFieldChange}
-          required
-          className="w-full px-4 py-2 border rounded"
+          name="fromEmail"
+          value={formData.fromEmail}
+          readOnly
+          className="w-full p-2 border rounded bg-gray-100"
         />
 
-        {/* To */}
+        {/* TO EMAIL (AUTO-FILLED) */}
         <input
           type="email"
-          name="to"
-          placeholder="To"
-          value={formData.to}
+          name="toEmail"
+          placeholder="Recipient Email"
+          value={formData.toEmail}
           onChange={handleFieldChange}
           required
-          className="w-full px-4 py-2 border rounded"
+          className="w-full p-2 border rounded"
         />
 
         {/* CC */}
         <input
           type="email"
-          name="cc"
+          name="ccEmail"
           placeholder="CC (optional)"
-          value={formData.cc}
+          value={formData.ccEmail}
           onChange={handleFieldChange}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full p-2 border rounded"
         />
 
-        {/* Subject */}
+        {/* SUBJECT */}
         <input
           type="text"
           name="subject"
@@ -127,219 +147,30 @@ export default function EmailSMS() {
           value={formData.subject}
           onChange={handleFieldChange}
           required
-          className="w-full px-4 py-2 border rounded"
+          className="w-full p-2 border rounded"
         />
 
-        {/* ✅ RICH TEXT EDITOR AREA */}
-        <div className="border rounded">
-          <Slate
-            editor={editor}
-            initialValue={value}              // 👈 this is NOW guaranteed to be an array
-            onChange={(newValue) => setValue(newValue)}
-          >
-            <Toolbar />
-            <div className="p-3 min-h-[150px] bg-white">
-              <Editable
-                renderElement={renderElement}
-                renderLeaf={renderLeaf}
-                placeholder="Type your rich message..."
-                className="outline-none"
-              />
-            </div>
-          </Slate>
-        </div>
+        {/* MESSAGE BOX */}
+        <textarea
+          name="description"
+          placeholder="Type your message..."
+          value={formData.description}
+          onChange={handleFieldChange}
+          required
+          className="w-full p-3 border rounded min-h-[150px]"
+        />
 
-        <div className="flex justify-end pt-4">
+        {/* SUBMIT BUTTON */}
+        <div className="flex justify-end">
           <button
             type="submit"
             disabled={loading}
             className="px-6 py-2 bg-black text-white rounded hover:bg-gray-800"
           >
-            {loading ? "Sending..." : "Send"}
+            {loading ? "Sending..." : "Send Email"}
           </button>
         </div>
       </form>
     </div>
   );
 }
-
-/* ---------- Toolbar & Buttons ---------- */
-
-const Toolbar = () => {
-  return (
-    <div className="flex flex-wrap gap-2 border-b p-2 bg-gray-100">
-      <MarkButton format="bold" label="B" />
-      <MarkButton format="italic" label="I" />
-      <MarkButton format="underline" label="U" />
-      <MarkButton format="strikethrough" label="S" />
-      <BlockButton format="block-quote" label="❝" />
-      <BlockButton format="bulleted-list" label="•" />
-      <BlockButton format="numbered-list" label="1." />
-      <ImageButton />
-    </div>
-  );
-};
-
-const MarkButton = ({ format, label }) => {
-  const editor = useSlate();
-  return (
-    <button
-      type="button"
-      onMouseDown={(e) => {
-        e.preventDefault();
-        toggleMark(editor, format);
-      }}
-      className="px-2 py-1 text-sm border rounded hover:bg-gray-200"
-    >
-      {label}
-    </button>
-  );
-};
-
-const BlockButton = ({ format, label }) => {
-  const editor = useSlate();
-  return (
-    <button
-      type="button"
-      onMouseDown={(e) => {
-        e.preventDefault();
-        toggleBlock(editor, format);
-      }}
-      className="px-2 py-1 text-sm border rounded hover:bg-gray-200"
-    >
-      {label}
-    </button>
-  );
-};
-
-const ImageButton = () => {
-  const editor = useSlate();
-
-  const insertImage = (editor, url) => {
-    const image = { type: "image", url, children: [{ text: "" }] };
-    Transforms.insertNodes(editor, image);
-    Transforms.insertNodes(editor, {
-      type: "paragraph",
-      children: [{ text: "" }],
-    });
-  };
-
-  const onChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.addEventListener("load", () => {
-      insertImage(editor, reader.result);
-    });
-
-    reader.readAsDataURL(file);
-  };
-
-  return (
-    <label className="px-2 py-1 text-sm border rounded cursor-pointer hover:bg-gray-200">
-      🖼
-      <input
-        type="file"
-        accept="image/*"
-        onChange={onChange}
-        className="hidden"
-      />
-    </label>
-  );
-};
-
-
-/* ---------- Slate helper functions ---------- */
-
-const toggleMark = (editor, format) => {
-  const isActive = isMarkActive(editor, format);
-  if (isActive) {
-    Editor.removeMark(editor, format);
-  } else {
-    Editor.addMark(editor, format, true);
-  }
-};
-
-const isMarkActive = (editor, format) => {
-  const marks = Editor.marks(editor);
-  return marks ? marks[format] === true : false;
-};
-
-const toggleBlock = (editor, format) => {
-  const isActive = isBlockActive(editor, format);
-
-  Transforms.unwrapNodes(editor, {
-    match: (n) =>
-      !Editor.isEditor(n) &&
-      SlateElement.isElement(n) &&
-      ["bulleted-list", "numbered-list"].includes(n.type),
-    split: true,
-  });
-
-  let newType = isActive ? "paragraph" : format;
-
-  Transforms.setNodes(editor, { type: newType });
-
-  if (!isActive && (format === "bulleted-list" || format === "numbered-list")) {
-    const block = { type: format, children: [] };
-    Transforms.wrapNodes(editor, block);
-  }
-};
-
-const isBlockActive = (editor, format) => {
-  const [match] = Editor.nodes(editor, {
-    match: (n) =>
-      !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === format,
-  });
-  return !!match;
-};
-
-/* ---------- Renderers ---------- */
-
-const renderElement = ({ attributes, children, element }) => {
-  switch (element.type) {
-    case "block-quote":
-      return (
-        <blockquote
-          className="border-l-4 pl-4 ml-1 italic text-gray-600"
-          {...attributes}
-        >
-          {children}
-        </blockquote>
-      );
-    case "bulleted-list":
-      return (
-        <ul className="list-disc pl-6" {...attributes}>
-          {children}
-        </ul>
-      );
-    case "numbered-list":
-      return (
-        <ol className="list-decimal pl-6" {...attributes}>
-          {children}
-        </ol>
-      );
-    case "image":
-      return (
-        <div {...attributes} contentEditable={false} className="my-2">
-          <img
-            src={element.url}
-            alt="Uploaded"
-            className="max-w-full rounded shadow"
-          />
-          {children}
-        </div>
-      );
-    default:
-      return <p {...attributes}>{children}</p>;
-  }
-};
-
-const renderLeaf = ({ attributes, children, leaf }) => {
-  if (leaf.bold) children = <strong>{children}</strong>;
-  if (leaf.italic) children = <em>{children}</em>;
-  if (leaf.underline) children = <u>{children}</u>;
-  if (leaf.strikethrough) children = <s>{children}</s>;
-  return <span {...attributes}>{children}</span>;
-};

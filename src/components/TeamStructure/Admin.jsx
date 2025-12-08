@@ -4,24 +4,44 @@ import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { TrashIcon, PencilIcon, EyeIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
-import adminsData from "../../json/admins.json";
+import useAxios from "../../Auth/useAxios";
 
 const AdminPage = () => {
+  const api = useAxios();
   const navigate = useNavigate();
 
   const [admins, setAdmins] = useState([]);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // ------------------ GET ONLY ADMIN USERS ------------------
+  const getAdmins = async () => {
+    try {
+      setLoading(true);
+
+      const res = await api.get("/auth"); // fetch all users
+
+      const onlyAdmins = res.data.filter(
+        (u) => u.role?.name?.toUpperCase() === "ADMIN"
+      );
+
+      setAdmins(onlyAdmins);
+    } catch (error) {
+      Swal.fire("Error", "Failed to load admins", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // load JSON data
-    setAdmins(adminsData);
+    getAdmins();
   }, []);
 
-  /** Delete admin locally */
+  // ------------------ DELETE ADMIN ------------------
   const handleDelete = async (id) => {
     const result = await Swal.fire({
       title: "Are you sure?",
-      text: "This admin will be removed from the table.",
+      text: "This admin will be removed.",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
@@ -30,17 +50,25 @@ const AdminPage = () => {
 
     if (!result.isConfirmed) return;
 
-    setAdmins(admins.filter((a) => a.id !== id));
+    try {
+      await api.delete(`/auth/${id}`);
+      Swal.fire("Deleted!", "Admin removed successfully.", "success");
 
-    Swal.fire("Deleted!", "Admin removed successfully.", "success");
+      getAdmins(); // refresh list
+    } catch {
+      Swal.fire("Error", "Failed to delete admin", "error");
+    }
   };
 
+  // ------------------ FILTER (Search) ------------------
   const filteredAdmins = admins.filter((a) =>
     (a.fullName || "").toLowerCase().includes(search.toLowerCase())
   );
 
   return (
     <div className="p-6">
+
+      {/* HEADER */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-blue-700">Admin Management</h1>
 
@@ -57,7 +85,7 @@ const AdminPage = () => {
         </div>
       </div>
 
-      {/* Table */}
+      {/* ADMIN TABLE */}
       <div className="overflow-x-auto bg-white shadow-lg rounded-lg">
         <table className="min-w-full text-left">
           <thead>
@@ -73,9 +101,17 @@ const AdminPage = () => {
           </thead>
 
           <tbody>
-            {filteredAdmins.length === 0 ? (
+            {loading ? (
               <tr>
-                <td colSpan="7" className="text-center py-6">No admins found</td>
+                <td colSpan="7" className="text-center py-6">
+                  Loading...
+                </td>
+              </tr>
+            ) : filteredAdmins.length === 0 ? (
+              <tr>
+                <td colSpan="7" className="text-center py-6">
+                  No admins found
+                </td>
               </tr>
             ) : (
               filteredAdmins.map((admin) => (
@@ -84,21 +120,20 @@ const AdminPage = () => {
                   <td className="px-4 py-3">{admin.fullName}</td>
                   <td className="px-4 py-3">{admin.email}</td>
                   <td className="px-4 py-3">{admin.username}</td>
-                  <td className="px-4 py-3">{admin.mobile}</td>
-                  <td className="px-4 py-3">{admin.role}</td>
+                  <td className="px-4 py-3">{admin.assignedMobileNumber}</td>
+                  <td className="px-4 py-3">{admin.role?.name}</td>
 
-                  {/* Action Buttons */}
                   <td className="px-4 py-3 flex items-center justify-center gap-3">
                     <button
                       className="text-blue-600 hover:text-blue-800"
-                      onClick={() => navigate(`/admin/view/${admin.id}`)}
+                      onClick={() => navigate(`/agents/view/${admin.id}`)}
                     >
                       <EyeIcon className="w-6 h-6" />
                     </button>
 
                     <button
                       className="text-yellow-600 hover:text-yellow-800"
-                      onClick={() => navigate(`/admin/edit/${admin.id}`)}
+                      onClick={() => navigate(`/agents/edit/${admin.id}`)}
                     >
                       <PencilIcon className="w-6 h-6" />
                     </button>

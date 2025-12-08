@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
-import rolesData from "../../json/roles.json";
-import {
-  EyeIcon,
-  PencilIcon,
-  TrashIcon,
-} from "@heroicons/react/24/outline";
+import { EyeIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
+import useAxios from "../../Auth/useAxios";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 const Roles = () => {
   const [roles, setRoles] = useState([]);
   const [search, setSearch] = useState("");
+  const api = useAxios();
+  const navigate = useNavigate();
 
   // Modals
   const [showAddModal, setShowAddModal] = useState(false);
@@ -19,32 +19,75 @@ const Roles = () => {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
 
   const [newRole, setNewRole] = useState({
-    roleName: "",
+    name: "",
     description: "",
   });
 
+  // Fetch all roles from backend
+  const fetchRoles = async () => {
+    try {
+      const res = await api.get("/api/roles");
+      setRoles(res.data);
+    } catch (error) {
+      Swal.fire("Error", "Failed to load roles", "error");
+    }
+  };
+
   useEffect(() => {
-    setRoles(rolesData); // Load JSON roles
+    fetchRoles();
   }, []);
 
   const filteredRoles = roles.filter((role) =>
-    role.roleName.toLowerCase().includes(search.toLowerCase())
+    role.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleDelete = (id) => {
-    const updated = roles.filter((role) => role.id !== id);
-    setRoles(updated);
-    setDeleteConfirm(null);
+  // DELETE role
+  const handleDelete = async (id) => {
+    try {
+      await api.delete(`/api/roles/${id}`);
+      setRoles(roles.filter((role) => role.id !== id));
+      setDeleteConfirm(null);
+      Swal.fire("Deleted!", "Role deleted successfully", "success");
+    } catch (error) {
+      Swal.fire("Error", "Failed to delete role", "error");
+    }
+  };
+
+  // ADD role
+  const handleAddRole = async () => {
+    try {
+      const res = await api.post("/api/roles", newRole);
+      setRoles([...roles, res.data]);
+      setNewRole({ name: "", description: "" });
+      setShowAddModal(false);
+      Swal.fire("Success", "Role added successfully", "success");
+    } catch (error) {
+      Swal.fire("Error", "Failed to add role", "error");
+    }
+  };
+
+  // EDIT role
+  const handleEditRole = async () => {
+    try {
+      const res = await api.put(
+        `/api/roles/${showEditModal.id}`,
+        showEditModal
+      );
+      const updated = roles.map((r) => (r.id === res.data.id ? res.data : r));
+      setRoles(updated);
+      setShowEditModal(null);
+      Swal.fire("Success", "Role updated successfully", "success");
+    } catch (error) {
+      Swal.fire("Error", "Failed to update role", "error");
+    }
   };
 
   return (
     <div className="p-6">
-
       {/* HEADER */}
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-blue-700">Roles</h1>
-
           <p className="text-sm text-gray-600">
             <a href="/dashboard" className="text-blue-600 hover:underline">
               Dashboard
@@ -75,13 +118,35 @@ const Roles = () => {
           Add Role
         </button>
 
-        <button className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700">
-          Delete Checked Roles
-        </button>
-
         <button
           className="px-4 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800"
-          onClick={() => setRoles([])}
+          onClick={() => {
+            Swal.fire({
+              title: "Are you sure?",
+              text: "This will delete all roles!",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "#d33",
+              cancelButtonColor: "#3085d6",
+              confirmButtonText: "Yes, delete all!",
+            }).then(async (result) => {
+              if (result.isConfirmed) {
+                try {
+                  await Promise.all(
+                    roles.map((role) => api.delete(`/api/roles/${role.id}`))
+                  );
+                  setRoles([]);
+                  Swal.fire(
+                    "Deleted!",
+                    "All roles have been deleted.",
+                    "success"
+                  );
+                } catch {
+                  Swal.fire("Error", "Failed to delete roles", "error");
+                }
+              }
+            });
+          }}
         >
           Delete All Roles
         </button>
@@ -94,7 +159,7 @@ const Roles = () => {
             <tr className="bg-blue-100 text-blue-900">
               <th className="px-4 py-3">ID</th>
               <th className="px-4 py-3">Role Name</th>
-              <th className="px-4 py-3">Description</th>
+              <th className="px-4 py-3">Permissions</th>
               <th className="px-4 py-3 text-center">Actions</th>
             </tr>
           </thead>
@@ -110,22 +175,28 @@ const Roles = () => {
               filteredRoles.map((role) => (
                 <tr key={role.id} className="border-b hover:bg-gray-100">
                   <td className="px-4 py-3">{role.id}</td>
-                  <td className="px-4 py-3">{role.roleName}</td>
-                  <td className="px-4 py-3">{role.description}</td>
+                  <td className="px-4 py-3">{role.name}</td>
+                  <td className="px-4 py-3">
+                    <button
+                      onClick={() =>
+                        navigate(`/team-structure/roles/permissions/${role.id}`)
+                      }
+                      className="text-purple-600 font-semibold underline"
+                    >
+                      Permissions
+                    </button>
+                  </td>
 
                   {/* ACTION BUTTONS */}
                   <td className="px-4 py-3 flex justify-center gap-3">
-
                     <EyeIcon
                       className="h-5 w-5 text-blue-600 cursor-pointer"
                       onClick={() => setShowViewModal(role)}
                     />
-
                     <PencilIcon
                       className="h-5 w-5 text-green-600 cursor-pointer"
                       onClick={() => setShowEditModal(role)}
                     />
-
                     <TrashIcon
                       className="h-5 w-5 text-red-600 cursor-pointer"
                       onClick={() => setDeleteConfirm(role)}
@@ -137,17 +208,16 @@ const Roles = () => {
           </tbody>
         </table>
       </div>
-            {/* ================= DELETE CONFIRMATION MODAL ================= */}
+
+      {/* DELETE CONFIRMATION MODAL */}
       {deleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white w-[380px] rounded-lg p-6 shadow-xl">
-
             <h2 className="text-xl font-bold text-red-700">Confirm Delete</h2>
             <p className="mt-3 text-gray-700">
               Are you sure you want to delete the role:
-              <span className="font-semibold"> {deleteConfirm.roleName}</span>?
+              <span className="font-semibold"> {deleteConfirm.name}</span>?
             </p>
-
             <div className="flex justify-end gap-3 mt-6">
               <button
                 onClick={() => setDeleteConfirm(null)}
@@ -155,7 +225,6 @@ const Roles = () => {
               >
                 No
               </button>
-
               <button
                 onClick={() => handleDelete(deleteConfirm.id)}
                 className="px-4 py-2 bg-red-700 text-white rounded hover:bg-red-800"
@@ -163,36 +232,21 @@ const Roles = () => {
                 Yes, Delete
               </button>
             </div>
-
           </div>
         </div>
       )}
 
-      {/* ================= ADD ROLE MODAL ================= */}
+      {/* ADD ROLE MODAL */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white w-[450px] rounded-lg shadow-xl p-6">
-
             <h2 className="text-xl font-bold text-blue-700 mb-4">Add Role</h2>
-
             <input
               type="text"
               placeholder="Role Name"
               className="border px-3 py-2 rounded w-full mb-3"
-              value={newRole.roleName}
-              onChange={(e) =>
-                setNewRole({ ...newRole, roleName: e.target.value })
-              }
-            />
-
-            <input
-              type="text"
-              placeholder="Description"
-              className="border px-3 py-2 rounded w-full mb-3"
-              value={newRole.description}
-              onChange={(e) =>
-                setNewRole({ ...newRole, description: e.target.value })
-              }
+              value={newRole.name}
+              onChange={(e) => setNewRole({ ...newRole, name: e.target.value })}
             />
 
             <div className="flex justify-end gap-3">
@@ -202,79 +256,51 @@ const Roles = () => {
               >
                 Cancel
               </button>
-
               <button
-                onClick={() => {
-                  const newId = roles.length + 1;
-                  setRoles([
-                    ...roles,
-                    { id: newId, ...newRole },
-                  ]);
-                  setNewRole({ roleName: "", description: "" });
-                  setShowAddModal(false);
-                }}
+                onClick={handleAddRole}
                 className="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-800"
               >
                 Add Role
               </button>
             </div>
-
           </div>
         </div>
       )}
 
-      {/* ================= VIEW ROLE MODAL ================= */}
+      {/* VIEW ROLE MODAL */}
       {showViewModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white w-[450px] rounded-lg shadow-xl p-6">
-
             <h2 className="text-xl font-bold text-blue-700">View Role</h2>
-
             <div className="mt-4 space-y-2 text-gray-700">
-              <p><strong>ID:</strong> {showViewModal.id}</p>
-              <p><strong>Name:</strong> {showViewModal.roleName}</p>
-              <p><strong>Description:</strong> {showViewModal.description}</p>
+              <p>
+                <strong>ID:</strong> {showViewModal.id}
+              </p>
+              <p>
+                <strong>Name:</strong> {showViewModal.name}
+              </p>
             </div>
-
             <button
               onClick={() => setShowViewModal(null)}
               className="mt-6 w-full py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-800"
             >
               Close
             </button>
-
           </div>
         </div>
       )}
 
-      {/* ================= EDIT ROLE MODAL ================= */}
+      {/* EDIT ROLE MODAL */}
       {showEditModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white w-[450px] rounded-lg shadow-xl p-6">
-
             <h2 className="text-xl font-bold text-green-700 mb-4">Edit Role</h2>
-
             <input
               type="text"
               className="border px-3 py-2 rounded w-full mb-3"
-              value={showEditModal.roleName}
+              value={showEditModal.name}
               onChange={(e) =>
-                setShowEditModal({
-                  ...showEditModal,
-                  roleName: e.target.value,
-                })
-              }
-            />
-
-            <input
-              type="text"
-              className="border px-3 py-2 rounded w-full mb-3"
-              value={showEditModal.description}
-              onChange={(e) =>
-                setShowEditModal({
-                  ...showEditModal,
-                  description: e.target.value,
-                })
+                setShowEditModal({ ...showEditModal, name: e.target.value })
               }
             />
 
@@ -285,28 +311,18 @@ const Roles = () => {
               >
                 Cancel
               </button>
-
               <button
-                onClick={() => {
-                  const updated = roles.map((r) =>
-                    r.id === showEditModal.id ? showEditModal : r
-                  );
-                  setRoles(updated);
-                  setShowEditModal(null);
-                }}
+                onClick={handleEditRole}
                 className="px-4 py-2 bg-green-700 text-white rounded hover:bg-green-800"
               >
                 Save Changes
               </button>
             </div>
-
           </div>
         </div>
       )}
-
     </div>
   );
 };
 
 export default Roles;
-

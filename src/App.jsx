@@ -25,6 +25,7 @@ import EmailSMS from "./components/EmailSMS/EmailSMS";
 import Task from "./components/Task/Task";
 import Invoice from "./components/Invoice/Invoice";
 import FollowupReport from "./components/FollowupReport/FollowupReport";
+import RolePermissions from "./components/Permissions/RolePermissions";
 
 function AppContent() {
   return (
@@ -52,6 +53,8 @@ function AppContent() {
           <Route path="/task" element={<Task />} />
           <Route path="/invoice" element={<Invoice />} />
           <Route path="/followup-report" element={<FollowupReport />} />
+
+          <Route path="/team-structure/roles/permissions/:roleId" element={<RolePermissions />} />
         </Route>
       </Route>
     </Routes>

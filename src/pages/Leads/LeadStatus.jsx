@@ -1,7 +1,6 @@
 // src/pages/LeadStatusPage.jsx
 
 import React, { useState, useEffect } from "react";
-import Swal from "sweetalert2";
 import leadStatusData from "../../json/allLeads.json";
 
 const LeadStatus = () => {
