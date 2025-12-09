@@ -10,6 +10,8 @@ const EditLeadPage = () => {
 
   const [loading, setLoading] = useState(false);
   const [lead, setLead] = useState(null);
+  const [userRole, setUserRole] = useState("");
+  const [currentUserId, setCurrentUserId] = useState("");
 
   const [sources, setSources] = useState([]);
   const [users, setUsers] = useState([]);
@@ -32,6 +34,14 @@ const EditLeadPage = () => {
     { value: "CANCELLED", label: "Cancelled" },
     { value: "OTHERS", label: "Others" },
   ];
+
+  useEffect(() => {
+    // Get current user role and ID
+    const role = localStorage.getItem("role");
+    const id = localStorage.getItem("userId");
+    setUserRole(role || "");
+    setCurrentUserId(id || "");
+  }, []);
 
   /** ------------------ GET ALL SOURCES ------------------ */
   const getAllSources = async () => {
@@ -108,6 +118,16 @@ const EditLeadPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Check if user is admin
+  const isAdmin = userRole === "ADMIN";
+
+  // Get assigned user's name for display
+  const getAssignedUserName = () => {
+    if (!lead) return "";
+    const user = users.find(u => u.id === lead.assignedToId);
+    return user ? `${user.fullName} (${user.username})` : lead.assignedToName || "Not Assigned";
   };
 
   if (!lead) return <div className="p-6">Loading...</div>;
@@ -224,19 +244,28 @@ const EditLeadPage = () => {
           onChange={(e) => setLead({ ...lead, followUpDate: e.target.value })}
         />
 
-        {/* Assigned To */}
-        <select
-          className="border px-3 py-2 rounded"
-          value={lead.assignedToId}
-          onChange={(e) => setLead({ ...lead, assignedToId: e.target.value })}
-        >
-          <option value="">Assign to Employee</option>
-          {users.map((u) => (
-            <option key={u.id} value={u.id}>
-              {u.fullName} ({u.username})
-            </option>
-          ))}
-        </select>
+        {/* Assigned To Field - Different display for admin vs non-admin */}
+        {isAdmin ? (
+          // ADMIN: Show dropdown to assign to any user
+          <select
+            className="border px-3 py-2 rounded"
+            value={lead.assignedToId}
+            onChange={(e) => setLead({ ...lead, assignedToId: e.target.value })}
+          >
+            <option value="">Assign to Employee</option>
+            {users.map((u) => (
+              <option key={u.id} value={u.id}>
+                {u.fullName} ({u.username})
+              </option>
+            ))}
+          </select>
+        ) : (
+          // NON-ADMIN: Show fixed text field (read-only) with current assignment
+          <div className="border px-3 py-2 rounded bg-gray-50">
+            <div className="text-sm text-gray-500">Assigned To</div>
+            <div className="font-medium">{getAssignedUserName()}</div>
+          </div>
+        )}
 
         {/* Note */}
         <textarea
