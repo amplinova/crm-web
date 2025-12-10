@@ -9,7 +9,7 @@ export default function EmailSMS() {
 
   const [formData, setFormData] = useState({
     leadId: "",
-    fromEmail: "satyanarayanarft@gmail.com", // Fixed From Email
+    fromEmail: "info@amplinova.com", // Fixed From Email
     toEmail: "",
     ccEmail: "",
     subject: "",
