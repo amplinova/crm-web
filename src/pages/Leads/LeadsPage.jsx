@@ -144,7 +144,7 @@ const LeadHistoryModal = ({ leadId, onClose }) => {
                   <option value="VISIT_DONE_LEADS">Visit Done</option>
                   <option value="BOOKED_LEADS">Booked</option>
                   <option value="COMPLETED">Completed</option>
-                  <option value="CANCELLED">Cancelled</option>
+                  <option value="CANCELLED">Not Intrested</option>
                   <option value="OTHERS">Others</option>
                 </select>
               </div>

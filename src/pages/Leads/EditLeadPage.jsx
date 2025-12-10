@@ -31,7 +31,7 @@ const EditLeadPage = () => {
     { value: "VISIT_DONE_LEADS", label: "Visit Done" },
     { value: "BOOKED_LEADS", label: "Booked" },
     { value: "COMPLETED", label: "Completed" },
-    { value: "CANCELLED", label: "Cancelled" },
+    { value: "CANCELLED", label: "Not intrested" },
     { value: "OTHERS", label: "Others" },
   ];
 

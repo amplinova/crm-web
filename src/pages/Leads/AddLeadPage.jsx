@@ -86,9 +86,11 @@ const AddLeadPage = () => {
             <a href="/dashboard" className="text-blue-600 hover:underline">
               Dashboard
             </a>{" "}
-            / <a href="/leads" className="text-blue-600 hover:underline">
+            /{" "}
+            <a href="/leads" className="text-blue-600 hover:underline">
               Leads
-            </a>{" "}/<span className="font-semibold text-blue-700">Add</span>
+            </a>{" "}
+            /<span className="font-semibold text-blue-700">Add</span>
           </p>
         </div>
       </div>
@@ -179,11 +181,21 @@ const AddLeadPage = () => {
           onChange={(e) => setNewLead({ ...newLead, status: e.target.value })}
         >
           <option value="">Select Status</option>
-          <option value="NEW">NEW</option>
-          <option value="IN_PROGRESS">IN PROGRESS</option>
-          <option value="FOLLOW_UP">FOLLOW UP</option>
-          <option value="CONVERTED">CONVERTED</option>
-          <option value="LOST">LOST</option>
+          <option value="NEW_LEADS">New Leads</option>
+          <option value="TRANSFER_LEADS">Transfer Leads</option>
+          <option value="PENDING_LEADS">Pending Leads</option>
+          <option value="PROCESSING_LEADS">Processing Leads</option>
+          <option value="INTERESTED_LEADS">Interested Leads</option>
+          <option value="NOT_PICKED_LEADS">Not Picked Leads</option>
+          <option value="MEETING_SCHEDULED_LEADS">Meeting Scheduled</option>
+          <option value="WHATSAPP_SCHEDULED_LEADS">Whatsapp Scheduled</option>
+          <option value="CALL_SCHEDULED_LEADS">Call Scheduled</option>
+          <option value="VISIT_SCHEDULED_LEADS">Visit Scheduled</option>
+          <option value="VISIT_DONE_LEADS">Visit Done</option>
+          <option value="BOOKED_LEADS">Booked</option>
+          <option value="COMPLETED">Completed</option>
+          <option value="CANCELLED">Not Intrested</option>
+          <option value="OTHERS">Others</option>
         </select>
 
         <input
