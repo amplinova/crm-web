@@ -159,3 +159,59 @@ body {
 nav::-webkit-scrollbar {
   display: none;
 }
+
+
+/* Ensure Swal modal is on top of everything */
+.swal2-container {
+  z-index: 9999 !important; /* Ensure it's on top */
+  position: fixed !important; /* Ensures it's fixed on the screen */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Ensure the backdrop is visible */
+.swal2-backdrop {
+  background: rgba(0, 0, 0, 0.5) !important; /* Make sure the backdrop is dark */
+  z-index: 9998 !important; /* Just below the modal */
+}
+
+/* Modal popup styling */
+.swal2-popup {
+  z-index: 10000 !important; /* Ensure the modal is on top */
+  background-color: #fff !important; /* Ensure the modal has a white background */
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+}
+
+/* Fix button visibility in Swal */
+.swal2-styled {
+  visibility: visible !important; /* Ensure buttons are always visible */
+  opacity: 1 !important;          /* Ensure buttons are fully visible */
+  pointer-events: auto !important;/* Allow interaction */
+  display: inline-block !important; /* Ensure buttons are inline and clickable */
+  z-index: 10001 !important;      /* Ensure buttons are above everything else */
+  transition: background-color 0.3s ease; /* Optional: Smooth transition for hover effects */
+}
+
+/* Optional: Change button styles to make them more noticeable */
+.swal2-confirm,
+.swal2-cancel {
+  background-color: #3085d6 !important; /* Customize button color */
+  color: white !important;              /* Button text color */
+}
+
+/* Fix backdrop fade-in animation conflict */
+.swal2-show {
+  animation: none !important; /* Disable SweetAlert fade-in */
+}
+
+/* Ensure particles and background layers stay behind */
+.floating-particles,
+.animated-grid,
+.pulse-glow {
+  z-index: 1 !important; /* Ensure background layers stay behind the modal */
+}

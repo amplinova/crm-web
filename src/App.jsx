@@ -27,6 +27,7 @@ import Invoice from "./components/Invoice/Invoice";
 import FollowupReport from "./components/FollowupReport/FollowupReport";
 import RolePermissions from "./components/Permissions/RolePermissions";
 import SettingsPage from "./pages/SettingsPage";
+import "./App.css";
 
 function AppContent() {
   return (
