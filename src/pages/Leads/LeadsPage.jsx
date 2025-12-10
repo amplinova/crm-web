@@ -8,6 +8,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ClockIcon,
+  DocumentDuplicateIcon,
 } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
 
@@ -252,6 +253,276 @@ const LeadHistoryModal = ({ leadId, onClose }) => {
   );
 };
 
+// Duplicates Modal Component
+const DuplicatesModal = ({ duplicates, onClose, onMerge, onDelete }) => {
+  const [loading, setLoading] = useState(false);
+  const [selectedForMerge, setSelectedForMerge] = useState([]);
+  const [selectedForDelete, setSelectedForDelete] = useState([]);
+  const [mergeToLead, setMergeToLead] = useState("");
+
+  // Group duplicates by mobile number
+  const groupedDuplicates = duplicates.reduce((groups, lead) => {
+    const mobile = lead.mobile;
+    if (!groups[mobile]) {
+      groups[mobile] = [];
+    }
+    groups[mobile].push(lead);
+    return groups;
+  }, {});
+
+  const toggleSelectForMerge = (leadId) => {
+    setSelectedForMerge(prev =>
+      prev.includes(leadId)
+        ? prev.filter(id => id !== leadId)
+        : [...prev, leadId]
+    );
+  };
+
+  const toggleSelectForDelete = (leadId) => {
+    setSelectedForDelete(prev =>
+      prev.includes(leadId)
+        ? prev.filter(id => id !== leadId)
+        : [...prev, leadId]
+    );
+  };
+
+  const handleMerge = async () => {
+    if (selectedForMerge.length < 2 || !mergeToLead) {
+      Swal.fire("Error", "Please select at least 2 leads and choose a lead to merge into", "error");
+      return;
+    }
+
+    const result = await Swal.fire({
+      title: "Confirm Merge",
+      html: `
+        <p>You are about to merge ${selectedForMerge.length} leads into lead ID: ${mergeToLead}</p>
+        <p class="text-sm text-gray-600 mt-2">All data from other leads will be merged and those leads will be deleted.</p>
+      `,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, merge them!",
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      setLoading(true);
+      await onMerge(selectedForMerge, mergeToLead);
+      Swal.fire("Success", "Leads merged successfully!", "success");
+      onClose();
+    } catch (error) {
+      Swal.fire("Error", "Failed to merge leads", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (selectedForDelete.length === 0) {
+      Swal.fire("Error", "Please select at least one lead to delete", "error");
+      return;
+    }
+
+    const result = await Swal.fire({
+      title: "Confirm Delete",
+      html: `You are about to delete ${selectedForDelete.length} duplicate lead(s). This action cannot be undone.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete them!",
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      setLoading(true);
+      await onDelete(selectedForDelete);
+      Swal.fire("Success", "Duplicate leads deleted successfully!", "success");
+      onClose();
+    } catch (error) {
+      Swal.fire("Error", "Failed to delete leads", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4">
+      <div className="bg-white w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-lg shadow-lg">
+        {/* Header */}
+        <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
+          <div>
+            <h2 className="text-lg font-semibold">Duplicate Leads by Mobile Number</h2>
+            <p className="text-sm text-gray-600">
+              Found {duplicates.length} leads with duplicate mobile numbers
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-red-500 text-xl font-bold hover:text-red-700"
+          >
+            ×
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-6">
+          {/* Merge Section */}
+          <div className="mb-8 p-4 border border-blue-200 rounded-lg bg-blue-50">
+            <h3 className="font-semibold text-blue-700 mb-3 flex items-center gap-2">
+              <DocumentDuplicateIcon className="w-5 h-5" />
+              Merge Duplicates
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Select leads to merge (select 2 or more):
+                </label>
+                <div className="max-h-40 overflow-y-auto border rounded p-2">
+                  {duplicates.map(lead => (
+                    <div key={lead.id} className="flex items-center gap-2 mb-2">
+                      <input
+                        type="checkbox"
+                        id={`merge-${lead.id}`}
+                        checked={selectedForMerge.includes(lead.id)}
+                        onChange={() => toggleSelectForMerge(lead.id)}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <label htmlFor={`merge-${lead.id}`} className="text-sm">
+                        {lead.customerName} ({lead.mobile}) - {lead.status}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Merge into (choose one lead to keep):
+                </label>
+                <select
+                  value={mergeToLead}
+                  onChange={(e) => setMergeToLead(e.target.value)}
+                  className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  disabled={selectedForMerge.length < 2}
+                >
+                  <option value="">Select lead to merge into</option>
+                  {selectedForMerge.map(leadId => {
+                    const lead = duplicates.find(l => l.id === leadId);
+                    return lead ? (
+                      <option key={lead.id} value={lead.id}>
+                        {lead.customerName} ({lead.mobile})
+                      </option>
+                    ) : null;
+                  })}
+                </select>
+                <p className="text-xs text-gray-500 mt-2">
+                  This lead will be kept, others will be deleted after merging their data
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={handleMerge}
+              disabled={selectedForMerge.length < 2 || !mergeToLead || loading}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {loading ? "Merging..." : `Merge ${selectedForMerge.length} Leads`}
+            </button>
+          </div>
+
+          {/* Delete Section */}
+          <div className="mb-8 p-4 border border-red-200 rounded-lg bg-red-50">
+            <h3 className="font-semibold text-red-700 mb-3">Delete Duplicates</h3>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Select duplicate leads to delete:
+              </label>
+              <div className="max-h-40 overflow-y-auto border rounded p-2">
+                {duplicates.map(lead => (
+                  <div key={lead.id} className="flex items-center gap-2 mb-2">
+                    <input
+                      type="checkbox"
+                      id={`delete-${lead.id}`}
+                      checked={selectedForDelete.includes(lead.id)}
+                      onChange={() => toggleSelectForDelete(lead.id)}
+                      className="rounded border-gray-300 text-red-600 focus:ring-red-500"
+                    />
+                    <label htmlFor={`delete-${lead.id}`} className="text-sm">
+                      {lead.customerName} ({lead.mobile}) - {lead.status}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <button
+              onClick={handleDelete}
+              disabled={selectedForDelete.length === 0 || loading}
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {loading ? "Deleting..." : `Delete ${selectedForDelete.length} Selected`}
+            </button>
+          </div>
+
+          {/* Duplicates List */}
+          <div>
+            <h3 className="font-semibold text-gray-700 mb-3">All Duplicates by Mobile Number</h3>
+            {Object.entries(groupedDuplicates).map(([mobile, leads]) => (
+              <div key={mobile} className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                <div className="bg-gray-100 px-4 py-2 border-b">
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">Mobile: {mobile}</span>
+                    <span className="text-sm text-gray-600">
+                      {leads.length} duplicate{leads.length > 1 ? 's' : ''}
+                    </span>
+                  </div>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">ID</th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Name</th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Status</th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Email</th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Assigned To</th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Created</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {leads.map(lead => (
+                        <tr key={lead.id} className="hover:bg-gray-50">
+                          <td className="px-4 py-2 text-sm">#{lead.id}</td>
+                          <td className="px-4 py-2 text-sm font-medium">{lead.customerName}</td>
+                          <td className="px-4 py-2">
+                            <span className={`px-2 py-1 text-xs rounded-full ${
+                              lead.status === "BOOKED_LEADS" || lead.status === "COMPLETED"
+                                ? "bg-green-100 text-green-800"
+                                : lead.status === "CANCELLED"
+                                ? "bg-red-100 text-red-800"
+                                : "bg-yellow-100 text-yellow-800"
+                            }`}>
+                              {lead.status}
+                            </span>
+                          </td>
+                          <td className="px-4 py-2 text-sm">{lead.email}</td>
+                          <td className="px-4 py-2 text-sm">{lead.assignedToName || "Unassigned"}</td>
+                          <td className="px-4 py-2 text-sm">{new Date(lead.createdAt).toLocaleDateString()}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Main LeadsPage Component
 const LeadsPage = () => {
   const api = useAxios();
@@ -284,6 +555,11 @@ const LeadsPage = () => {
   // Modal state
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [selectedLeadId, setSelectedLeadId] = useState(null);
+
+  // Duplicate detection state
+  const [showDuplicatesModal, setShowDuplicatesModal] = useState(false);
+  const [duplicates, setDuplicates] = useState([]);
+  const [checkingDuplicates, setCheckingDuplicates] = useState(false);
 
   const leadStatusOptions = [
     { value: "NEW_LEADS", label: "New Leads" },
@@ -490,6 +766,73 @@ const LeadsPage = () => {
     setSelectedLeadId(null);
   };
 
+  /** Find Duplicates by Mobile Number */
+  const findDuplicatesByMobile = () => {
+    setCheckingDuplicates(true);
+    
+    // Find leads with duplicate mobile numbers
+    const mobileCount = {};
+    leads.forEach(lead => {
+      if (lead.mobile) {
+        mobileCount[lead.mobile] = (mobileCount[lead.mobile] || 0) + 1;
+      }
+    });
+
+    const duplicateMobiles = Object.keys(mobileCount).filter(mobile => mobileCount[mobile] > 1);
+    
+    if (duplicateMobiles.length === 0) {
+      Swal.fire("No Duplicates", "No duplicate mobile numbers found in the current leads list.", "info");
+      setCheckingDuplicates(false);
+      return;
+    }
+
+    // Get all leads with duplicate mobile numbers
+    const duplicateLeads = leads.filter(lead => 
+      lead.mobile && duplicateMobiles.includes(lead.mobile)
+    );
+
+    setDuplicates(duplicateLeads);
+    setShowDuplicatesModal(true);
+    setCheckingDuplicates(false);
+  };
+
+  /** Merge duplicate leads */
+  const handleMergeLeads = async (leadIds, mergeIntoLeadId) => {
+    try {
+      const response = await api.post("/api/leads/merge", {
+        leadIds,
+        mergeIntoLeadId
+      });
+      
+      // Reload leads after merge
+      loadLeads();
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  /** Delete duplicate leads */
+  const handleDeleteLeads = async (leadIds) => {
+    try {
+      // Delete leads one by one
+      for (const leadId of leadIds) {
+        await api.delete(`/api/leads/${leadId}`);
+      }
+      
+      // Reload leads after deletion
+      loadLeads();
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  /** Close Duplicates Modal */
+  const closeDuplicatesModal = () => {
+    setShowDuplicatesModal(false);
+    setDuplicates([]);
+  };
+
   /** Apply filters */
   const filteredLeads = leads
     .filter((lead) => {
@@ -651,6 +994,14 @@ const LeadsPage = () => {
             >
               Assign Selected Leads
             </button>
+            <button
+              className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 whitespace-nowrap transition-colors flex items-center gap-2"
+              onClick={findDuplicatesByMobile}
+              disabled={checkingDuplicates}
+            >
+              <DocumentDuplicateIcon className="w-4 h-4" />
+              {checkingDuplicates ? "Checking..." : "Find Duplicates"}
+            </button>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto mt-3 md:mt-0">
@@ -682,6 +1033,14 @@ const LeadsPage = () => {
               className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-800 whitespace-nowrap text-center transition-colors"
             >
               Add Lead
+            </button>
+            <button
+              className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 whitespace-nowrap transition-colors flex items-center gap-2"
+              onClick={findDuplicatesByMobile}
+              disabled={checkingDuplicates}
+            >
+              <DocumentDuplicateIcon className="w-4 h-4" />
+              {checkingDuplicates ? "Checking..." : "Find Duplicates"}
             </button>
           </div>
         </div>
@@ -1013,6 +1372,16 @@ const LeadsPage = () => {
       {/* Lead History Modal */}
       {showHistoryModal && selectedLeadId && (
         <LeadHistoryModal leadId={selectedLeadId} onClose={closeHistoryModal} />
+      )}
+
+      {/* Duplicates Modal */}
+      {showDuplicatesModal && (
+        <DuplicatesModal
+          duplicates={duplicates}
+          onClose={closeDuplicatesModal}
+          onMerge={handleMergeLeads}
+          onDelete={handleDeleteLeads}
+        />
       )}
     </div>
   );
