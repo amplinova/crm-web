@@ -100,7 +100,7 @@ const Dashboard = () => {
       { label: "Visit Done Leads", count: getStatus("VISIT_DONE_LEADS"), icon: <FaCheckCircle className="h-7 w-7 text-green-600" /> },
       { label: "Booked Leads", count: getStatus("BOOKED_LEADS"), icon: <FaCheckCircle className="h-7 w-7 text-green-700" /> },
       { label: "Completed", count: getStatus("COMPLETED"), icon: <FaCheckCircle className="h-7 w-7 text-green-800" /> },
-      { label: "Cancelled", count: getStatus("CANCELLED"), icon: <FaTimesCircle className="h-7 w-7 text-red-700" /> },
+      { label: "Not Intrested", count: getStatus("CANCELLED"), icon: <FaTimesCircle className="h-7 w-7 text-red-700" /> },
       { label: "Duplicate Leads", count: duplicateLeads, icon: <FaTimesCircle className="h-7 w-7 text-red-700" /> },
       { label: "Others", count: getStatus("OTHERS"), icon: <FaUsers className="h-7 w-7 text-gray-700" /> },
     ],

@@ -254,11 +254,8 @@ const LeadHistoryModal = ({ leadId, onClose }) => {
 };
 
 // Duplicates Modal Component
-const DuplicatesModal = ({ duplicates, onClose, onMerge, onDelete }) => {
-  const [loading, setLoading] = useState(false);
-  const [selectedForMerge, setSelectedForMerge] = useState([]);
-  const [selectedForDelete, setSelectedForDelete] = useState([]);
-  const [mergeToLead, setMergeToLead] = useState("");
+const DuplicatesModal = ({ duplicates, onClose }) => {
+  
 
   // Group duplicates by mobile number
   const groupedDuplicates = duplicates.reduce((groups, lead) => {
@@ -270,84 +267,12 @@ const DuplicatesModal = ({ duplicates, onClose, onMerge, onDelete }) => {
     return groups;
   }, {});
 
-  const toggleSelectForMerge = (leadId) => {
-    setSelectedForMerge(prev =>
-      prev.includes(leadId)
-        ? prev.filter(id => id !== leadId)
-        : [...prev, leadId]
-    );
-  };
+  
 
-  const toggleSelectForDelete = (leadId) => {
-    setSelectedForDelete(prev =>
-      prev.includes(leadId)
-        ? prev.filter(id => id !== leadId)
-        : [...prev, leadId]
-    );
-  };
+ 
 
-  const handleMerge = async () => {
-    if (selectedForMerge.length < 2 || !mergeToLead) {
-      Swal.fire("Error", "Please select at least 2 leads and choose a lead to merge into", "error");
-      return;
-    }
-
-    const result = await Swal.fire({
-      title: "Confirm Merge",
-      html: `
-        <p>You are about to merge ${selectedForMerge.length} leads into lead ID: ${mergeToLead}</p>
-        <p class="text-sm text-gray-600 mt-2">All data from other leads will be merged and those leads will be deleted.</p>
-      `,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, merge them!",
-    });
-
-    if (!result.isConfirmed) return;
-
-    try {
-      setLoading(true);
-      await onMerge(selectedForMerge, mergeToLead);
-      Swal.fire("Success", "Leads merged successfully!", "success");
-      onClose();
-    } catch (error) {
-      Swal.fire("Error", "Failed to merge leads", "error");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDelete = async () => {
-    if (selectedForDelete.length === 0) {
-      Swal.fire("Error", "Please select at least one lead to delete", "error");
-      return;
-    }
-
-    const result = await Swal.fire({
-      title: "Confirm Delete",
-      html: `You are about to delete ${selectedForDelete.length} duplicate lead(s). This action cannot be undone.`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, delete them!",
-    });
-
-    if (!result.isConfirmed) return;
-
-    try {
-      setLoading(true);
-      await onDelete(selectedForDelete);
-      Swal.fire("Success", "Duplicate leads deleted successfully!", "success");
-      onClose();
-    } catch (error) {
-      Swal.fire("Error", "Failed to delete leads", "error");
-    } finally {
-      setLoading(false);
-    }
-  };
+  
+ 
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4">
@@ -370,100 +295,7 @@ const DuplicatesModal = ({ duplicates, onClose, onMerge, onDelete }) => {
 
         {/* Content */}
         <div className="p-6">
-          {/* Merge Section */}
-          <div className="mb-8 p-4 border border-blue-200 rounded-lg bg-blue-50">
-            <h3 className="font-semibold text-blue-700 mb-3 flex items-center gap-2">
-              <DocumentDuplicateIcon className="w-5 h-5" />
-              Merge Duplicates
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Select leads to merge (select 2 or more):
-                </label>
-                <div className="max-h-40 overflow-y-auto border rounded p-2">
-                  {duplicates.map(lead => (
-                    <div key={lead.id} className="flex items-center gap-2 mb-2">
-                      <input
-                        type="checkbox"
-                        id={`merge-${lead.id}`}
-                        checked={selectedForMerge.includes(lead.id)}
-                        onChange={() => toggleSelectForMerge(lead.id)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <label htmlFor={`merge-${lead.id}`} className="text-sm">
-                        {lead.customerName} ({lead.mobile}) - {lead.status}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Merge into (choose one lead to keep):
-                </label>
-                <select
-                  value={mergeToLead}
-                  onChange={(e) => setMergeToLead(e.target.value)}
-                  className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  disabled={selectedForMerge.length < 2}
-                >
-                  <option value="">Select lead to merge into</option>
-                  {selectedForMerge.map(leadId => {
-                    const lead = duplicates.find(l => l.id === leadId);
-                    return lead ? (
-                      <option key={lead.id} value={lead.id}>
-                        {lead.customerName} ({lead.mobile})
-                      </option>
-                    ) : null;
-                  })}
-                </select>
-                <p className="text-xs text-gray-500 mt-2">
-                  This lead will be kept, others will be deleted after merging their data
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={handleMerge}
-              disabled={selectedForMerge.length < 2 || !mergeToLead || loading}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {loading ? "Merging..." : `Merge ${selectedForMerge.length} Leads`}
-            </button>
-          </div>
-
-          {/* Delete Section */}
-          <div className="mb-8 p-4 border border-red-200 rounded-lg bg-red-50">
-            <h3 className="font-semibold text-red-700 mb-3">Delete Duplicates</h3>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Select duplicate leads to delete:
-              </label>
-              <div className="max-h-40 overflow-y-auto border rounded p-2">
-                {duplicates.map(lead => (
-                  <div key={lead.id} className="flex items-center gap-2 mb-2">
-                    <input
-                      type="checkbox"
-                      id={`delete-${lead.id}`}
-                      checked={selectedForDelete.includes(lead.id)}
-                      onChange={() => toggleSelectForDelete(lead.id)}
-                      className="rounded border-gray-300 text-red-600 focus:ring-red-500"
-                    />
-                    <label htmlFor={`delete-${lead.id}`} className="text-sm">
-                      {lead.customerName} ({lead.mobile}) - {lead.status}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <button
-              onClick={handleDelete}
-              disabled={selectedForDelete.length === 0 || loading}
-              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {loading ? "Deleting..." : `Delete ${selectedForDelete.length} Selected`}
-            </button>
-          </div>
+         
 
           {/* Duplicates List */}
           <div>
@@ -575,7 +407,7 @@ const LeadsPage = () => {
     { value: "VISIT_DONE_LEADS", label: "Visit Done" },
     { value: "BOOKED_LEADS", label: "Booked" },
     { value: "COMPLETED", label: "Completed" },
-    { value: "CANCELLED", label: "Cancelled" },
+    { value: "CANCELLED", label: "Not Intrested" },
     { value: "OTHERS", label: "Others" },
   ];
 
