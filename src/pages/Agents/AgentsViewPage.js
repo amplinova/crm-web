@@ -56,51 +56,7 @@ const UserViewPage = () => {
       outgoing_calls: 9,
       total_calls: 27,
     },
-    {
-      sNo: 6,
-      date: "2025-02-02",
-      talk_time: "190",
-      received_calls: 16,
-      missed_calls: 2,
-      outgoing_calls: 11,
-      total_calls: 29,
-    },
-    {
-      sNo: 7,
-      date: "2025-02-03",
-      talk_time: "210",
-      received_calls: 17,
-      missed_calls: 1,
-      outgoing_calls: 13,
-      total_calls: 31,
-    },
-    {
-      sNo: 8,
-      date: "2025-02-04",
-      talk_time: "140",
-      received_calls: 11,
-      missed_calls: 5,
-      outgoing_calls: 7,
-      total_calls: 23,
-    },
-    {
-      sNo: 9,
-      date: "2025-02-05",
-      talk_time: "175",
-      received_calls: 13,
-      missed_calls: 3,
-      outgoing_calls: 10,
-      total_calls: 26,
-    },
-    {
-      sNo: 10,
-      date: "2025-02-06",
-      talk_time: "195",
-      received_calls: 15,
-      missed_calls: 2,
-      outgoing_calls: 12,
-      total_calls: 29,
-    },
+   
   ]);
   
   // Search and Sort states for leads
@@ -122,7 +78,7 @@ const UserViewPage = () => {
   useEffect(() => {
     api
       .get(`/auth/${id}`)
-      .then((res) => setUser(res.data))
+      .then((res) => setUser(res.data.data))
       .catch(() => setUser(null));
   }, [id]);
 

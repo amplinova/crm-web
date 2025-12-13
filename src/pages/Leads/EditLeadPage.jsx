@@ -19,19 +19,31 @@ const EditLeadPage = () => {
   /** ------------------ LEAD STATUS ENUMS ------------------ */
   const leadStatusOptions = [
     { value: "NEW_LEADS", label: "New Leads" },
-    { value: "TRANSFER_LEADS", label: "Transfer Leads" },
+    { value: "QUALIFIED_LEADS", label: "Qualified Leads" },
+    { value: "DISQUALIFIED_LEADS", label: "Disqualified Leads" },
     { value: "PENDING_LEADS", label: "Pending Leads" },
-    { value: "PROCESSING_LEADS", label: "Processing Leads" },
     { value: "INTERESTED_LEADS", label: "Interested Leads" },
-    { value: "NOT_PICKED_LEADS", label: "Not Picked Leads" },
-    { value: "MEETING_SCHEDULED_LEADS", label: "Meeting Scheduled" },
-    { value: "WHATSAPP_SCHEDULED_LEADS", label: "Whatsapp Scheduled" },
+    { value: "NOT_INTERESTED_LEADS", label: "Not Interested" },
+    { value: "BUY_LATER", label: "Buy Later" },
+    { value: "INVALID_NUMBER", label: "Invalid Number" },
+    { value: "NOT_PICKED_LEADS", label: "Not Picked" },
+
+    { value: "DEMO_SCHEDULED_LEADS", label: "Demo Scheduled" },
+    { value: "DEMO_CONDUCTED", label: "Demo Conducted" },
+    { value: "DEMO_RESCHEDULED", label: "Demo Rescheduled" },
+
     { value: "CALL_SCHEDULED_LEADS", label: "Call Scheduled" },
     { value: "VISIT_SCHEDULED_LEADS", label: "Visit Scheduled" },
     { value: "VISIT_DONE_LEADS", label: "Visit Done" },
-    { value: "BOOKED_LEADS", label: "Booked" },
-    { value: "COMPLETED", label: "Completed" },
-    { value: "CANCELLED", label: "Not intrested" },
+
+    { value: "SALE_DONE", label: "Sale Done" },
+    {
+      value: "SALE_DONE_PAYMENT_PENDING",
+      label: "Sale Done – Payment Pending",
+    },
+    { value: "PAYMENT_PENDING", label: "Payment Pending" },
+
+    { value: "RETENTION_CLIENTS", label: "Retention Client" },
     { value: "OTHERS", label: "Others" },
   ];
 
@@ -57,7 +69,7 @@ const EditLeadPage = () => {
   const getAllUsers = async () => {
     try {
       const res = await api.get("/auth/id-names");
-      setUsers(res.data);
+      setUsers(res.data.data);
     } catch {
       Swal.fire("Error", "Failed to load users", "error");
     }
@@ -103,7 +115,11 @@ const EditLeadPage = () => {
   /** ------------------ UPDATE LEAD ------------------ */
   const handleUpdate = async () => {
     if (!lead.customerName || !lead.mobile || !lead.sourceId) {
-      Swal.fire("Required", "Customer Name, Mobile & Source are required", "warning");
+      Swal.fire(
+        "Required",
+        "Customer Name, Mobile & Source are required",
+        "warning"
+      );
       return;
     }
 
@@ -126,8 +142,10 @@ const EditLeadPage = () => {
   // Get assigned user's name for display
   const getAssignedUserName = () => {
     if (!lead) return "";
-    const user = users.find(u => u.id === lead.assignedToId);
-    return user ? `${user.fullName} (${user.username})` : lead.assignedToName || "Not Assigned";
+    const user = users.find((u) => u.id === lead.assignedToId);
+    return user
+      ? `${user.fullName} (${user.username})`
+      : lead.assignedToName || "Not Assigned";
   };
 
   if (!lead) return <div className="p-6">Loading...</div>;
@@ -139,16 +157,20 @@ const EditLeadPage = () => {
         <div>
           <h1 className="text-2xl font-bold text-blue-700">Lead Management</h1>
           <p className="text-sm text-gray-600">
-            <a href="/dashboard" className="text-blue-600 hover:underline">Dashboard</a> /
-            <a href="/leads" className="text-blue-600 hover:underline ml-1">Leads</a> /
-            <span className="font-semibold text-blue-700 ml-1">Edit</span>
+            <a href="/dashboard" className="text-blue-600 hover:underline">
+              Dashboard
+            </a>{" "}
+            /
+            <a href="/leads" className="text-blue-600 hover:underline ml-1">
+              Leads
+            </a>{" "}
+            /<span className="font-semibold text-blue-700 ml-1">Edit</span>
           </p>
         </div>
       </div>
 
       {/* Form */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-6 shadow-xl rounded-lg">
-
         <input
           type="text"
           placeholder="Customer Name *"
@@ -200,7 +222,9 @@ const EditLeadPage = () => {
           placeholder="Business Category"
           className="border px-3 py-2 rounded"
           value={lead.businessCategory}
-          onChange={(e) => setLead({ ...lead, businessCategory: e.target.value })}
+          onChange={(e) =>
+            setLead({ ...lead, businessCategory: e.target.value })
+          }
         />
 
         <input

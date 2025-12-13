@@ -21,8 +21,8 @@ const AdminPage = () => {
 
       const res = await api.get("/auth"); // fetch all users
 
-      const onlyAdmins = res.data.filter(
-        (u) => u.role?.name?.toUpperCase() === "ADMIN"
+      const onlyAdmins = res.data.data.filter(
+        (u) => u.roleName?.toUpperCase() === "ADMIN"
       );
 
       setAdmins(onlyAdmins);
@@ -121,7 +121,7 @@ const AdminPage = () => {
                   <td className="px-4 py-3">{admin.email}</td>
                   <td className="px-4 py-3">{admin.username}</td>
                   <td className="px-4 py-3">{admin.assignedMobileNumber}</td>
-                  <td className="px-4 py-3">{admin.role?.name}</td>
+                  <td className="px-4 py-3">{admin.roleName}</td>
 
                   <td className="px-4 py-3 flex items-center justify-center gap-3">
                     <button

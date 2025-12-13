@@ -27,7 +27,7 @@ const Roles = () => {
   const fetchRoles = async () => {
     try {
       const res = await api.get("/api/roles");
-      setRoles(res.data);
+      setRoles(res.data.data);
     } catch (error) {
       Swal.fire("Error", "Failed to load roles", "error");
     }

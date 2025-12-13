@@ -30,8 +30,13 @@ const UsersPage = () => {
     try {
       setLoading(true);
       const res = await api.get("/auth");
-      setUsers(res.data);
-    } catch {
+
+      if (res.data.success) {
+        setUsers(res.data.data);
+      } else {
+        Swal.fire("Error", res.data.message || "Failed to load users", "error");
+      }
+    } catch (error) {
       Swal.fire("Error", "Failed to load users", "error");
     } finally {
       setLoading(false);
@@ -42,7 +47,13 @@ const UsersPage = () => {
   const getAllRoles = async () => {
     try {
       const res = await api.get("/api/roles");
-      setRoles(res.data);
+      console.log(res);
+
+      if (res.data.success) {
+        setRoles(res.data.data);
+      } else {
+        Swal.fire("Error", res.data.message || "Failed to load roles", "error");
+      }
     } catch {
       Swal.fire("Error", "Failed to load roles", "error");
     }
@@ -54,52 +65,48 @@ const UsersPage = () => {
   }, []);
 
   // ------------------ ADD EMPLOYEE ------------------
- const handleAddUser = async () => {
-  if (!newUser.fullName || !newUser.username || !newUser.roleId) {
-    Swal.fire("Error", "Please fill required fields", "error");
-    return;
-  }
-
-  try {
-    setLoading(true);
-
-    const response = await api.post("/auth/register", newUser, {
-      headers: { "Content-Type": "application/json" },
-    });
-
-    if (response.data?.success === false) {
-      Swal.fire("Error", response.data.message || "Registration failed", "error");
+  const handleAddUser = async () => {
+    if (!newUser.fullName || !newUser.username || !newUser.roleId) {
+      Swal.fire("Error", "Please fill required fields", "error");
       return;
     }
 
-    Swal.fire("Success", "Employee added successfully!", "success");
+    try {
+      setLoading(true);
 
-    setShowAddModal(false);
-    setNewUser({
-      fullName: "",
-      email: "",
-      username: "",
-      assignedMobileNumber: "",
-      address: "",
-      roleId: "",
-      gender: "",
-      assignedUnderId: null,
-    });
+      const response = await api.post("/auth/register", newUser, {
+        headers: { "Content-Type": "application/json" },
+      });
 
-    getAllUsers();
-  } catch (error) {
-    const backendMessage =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      error.response?.data ||
-      "Something went wrong";
+      if (!response.data.success) {
+        Swal.fire("Error", response.data.message, "error");
+        return;
+      }
 
-    Swal.fire("Error", backendMessage, "error");
-  } finally {
-    setLoading(false);
-  }
-};
+      Swal.fire("Success", "Employee added successfully!", "success");
 
+      setShowAddModal(false);
+      setNewUser({
+        fullName: "",
+        email: "",
+        username: "",
+        assignedMobileNumber: "",
+        address: "",
+        roleId: "",
+        gender: "",
+        assignedUnderId: null,
+      });
+
+      getAllUsers();
+    } catch (error) {
+      const backendMessage =
+        error.response?.data?.message ||
+        "Something went wrong";
+      Swal.fire("Error", backendMessage, "error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // ------------------ DELETE SINGLE USER ------------------
   const handleDeleteUser = async (id) => {
@@ -116,7 +123,13 @@ const UsersPage = () => {
     if (!result.isConfirmed) return;
 
     try {
-      await api.delete(`/auth/${id}`);
+      const res = await api.delete(`/auth/${id}`);
+
+      if (!res.data.success) {
+        Swal.fire("Error", res.data.message, "error");
+        return;
+      }
+
       Swal.fire("Deleted!", "Employee deleted successfully.", "success");
       getAllUsers();
     } catch {
@@ -213,7 +226,9 @@ const UsersPage = () => {
             {loading ? (
               <tr>
                 <td colSpan="7" className="text-center py-6">
-                  <span className="animate-pulse text-blue-700 font-semibold">Loading...</span>
+                  <span className="animate-pulse text-blue-700 font-semibold">
+                    Loading...
+                  </span>
                 </td>
               </tr>
             ) : filteredUsers.length === 0 ? (
@@ -230,7 +245,7 @@ const UsersPage = () => {
                   <td className="px-4 py-3">{user.email}</td>
                   <td className="px-4 py-3">{user.username}</td>
                   <td className="px-4 py-3">{user.assignedMobileNumber}</td>
-                  <td className="px-4 py-3">{user.role?.name}</td>
+                  <td className="px-4 py-3">{user.roleName}</td>
 
                   <td className="px-4 py-3 flex items-center justify-center gap-3">
                     <button
@@ -265,14 +280,18 @@ const UsersPage = () => {
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white w-[500px] rounded-lg shadow-xl p-6">
-            <h2 className="text-xl font-bold text-green-700 mb-4">Add Employee</h2>
+            <h2 className="text-xl font-bold text-green-700 mb-4">
+              Add Employee
+            </h2>
 
             <input
               type="text"
               placeholder="Full Name"
               className="border px-3 py-2 rounded w-full mb-3"
               value={newUser.fullName}
-              onChange={(e) => setNewUser({ ...newUser, fullName: e.target.value })}
+              onChange={(e) =>
+                setNewUser({ ...newUser, fullName: e.target.value })
+              }
             />
 
             <input
@@ -280,7 +299,9 @@ const UsersPage = () => {
               placeholder="Email"
               className="border px-3 py-2 rounded w-full mb-3"
               value={newUser.email}
-              onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+              onChange={(e) =>
+                setNewUser({ ...newUser, email: e.target.value })
+              }
             />
 
             <input
@@ -288,7 +309,9 @@ const UsersPage = () => {
               placeholder="Username"
               className="border px-3 py-2 rounded w-full mb-3"
               value={newUser.username}
-              onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
+              onChange={(e) =>
+                setNewUser({ ...newUser, username: e.target.value })
+              }
             />
 
             <input
@@ -299,7 +322,9 @@ const UsersPage = () => {
               onChange={(e) =>
                 setNewUser({
                   ...newUser,
-                  assignedMobileNumber: e.target.value.replace(/[^0-9]/g, "").slice(0, 10),
+                  assignedMobileNumber: e.target.value
+                    .replace(/[^0-9]/g, "")
+                    .slice(0, 10),
                 })
               }
             />
@@ -309,13 +334,17 @@ const UsersPage = () => {
               placeholder="Address"
               className="border px-3 py-2 rounded w-full mb-3"
               value={newUser.address}
-              onChange={(e) => setNewUser({ ...newUser, address: e.target.value })}
+              onChange={(e) =>
+                setNewUser({ ...newUser, address: e.target.value })
+              }
             />
 
             <select
               className="border px-3 py-2 rounded w-full mb-3"
               value={newUser.roleId}
-              onChange={(e) => setNewUser({ ...newUser, roleId: parseInt(e.target.value) })}
+              onChange={(e) =>
+                setNewUser({ ...newUser, roleId: parseInt(e.target.value) })
+              }
             >
               <option value="">Select Role</option>
               {roles.map((role) => (
@@ -329,7 +358,11 @@ const UsersPage = () => {
               className="border px-3 py-2 rounded w-full mb-3"
               value={newUser.assignedUnderId || ""}
               onChange={(e) =>
-                setNewUser({ ...newUser, assignedUnderId: parseInt(e.target.value) || null })
+                setNewUser({
+                  ...newUser,
+                  assignedUnderId:
+                    parseInt(e.target.value) || null,
+                })
               }
             >
               <option value="">Assigned Under (Optional)</option>

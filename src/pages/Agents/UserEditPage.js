@@ -16,7 +16,7 @@ const UserEditPage = () => {
   const getAllUsers = async () => {
     try {
       const res = await api.get("/auth/id-names");
-      setEmployees(res.data);
+      setEmployees(res.data.data);
     } catch {
       Swal.fire("Error", "Failed to load employees list", "error");
     }
@@ -27,7 +27,7 @@ const UserEditPage = () => {
     const res = await api.get(`/auth/${id}`);
 
     setUser({
-      ...res.data,
+      ...res.data.data,
       roleId: res.data.role?.id || "",
       assignedUnderId: res.data.assignedUnder?.id || ""
     });
@@ -36,7 +36,7 @@ const UserEditPage = () => {
   // Load roles
   const loadRoles = async () => {
     const res = await api.get(`/api/roles`);
-    setRoles(res.data);
+    setRoles(res.data.data);
   };
 
   useEffect(() => {

@@ -41,7 +41,7 @@ const AddLeadPage = () => {
   const getAllUsers = async () => {
     try {
       const res = await api.get("/auth/id-names");
-      setUsers(res.data);
+      setUsers(res.data.data);
     } catch {
       Swal.fire("Error", "Failed to load users", "error");
     }
